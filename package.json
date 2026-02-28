@@ -1,0 +1,69 @@
+{
+  "name": "@sri-lanka/nic",
+  "version": "1.0.0",
+  "description": "A lightweight library for parsing, validating, sanitizing, and converting Sri Lankan National Identity Card (NIC) numbers.",
+  "author": "Vinod Liyanage <vinodliyanage.me>",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "sri-lanka",
+    "nic",
+    "national-identity-card",
+    "validator",
+    "parser",
+    "converter",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vinodliyanage/sri-lanka-nic"
+  },
+  "homepage": "https://nic.vinodliyanage.me",
+  "bugs": {
+    "url": "https://github.com/vinodliyanage/sri-lanka-nic/issues"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --config vite.lib.config.ts",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "pnpm run build"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/node": "^25.2.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "@vitest/coverage-v8": "4.0.18",
+    "autoprefixer": "^10.4.24",
+    "lucide-react": "^0.564.0",
+    "postcss": "^8.5.6",
+    "prism-react-renderer": "^2.4.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.1.18",
+    "terser": "^5.46.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.0.18",
+    "zod": "^4.3.6"
+  }
+}

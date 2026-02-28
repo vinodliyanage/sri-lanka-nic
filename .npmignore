@@ -1,0 +1,26 @@
+# Source
+src/
+
+# Demo
+index.html
+dist-demo/
+
+# Config
+tsconfig.json
+tsconfig.lib.json
+tsconfig.node.json
+vite.config.ts
+vite.lib.config.ts
+tailwind.config.js
+postcss.config.js
+
+# Dev
+node_modules/
+.github/
+.gitignore
+.npmignore
+.DS_Store
+*.tsbuildinfo
+pnpm-lock.yaml
+coverage/
+CONTRIBUTING.md
