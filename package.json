@@ -1,6 +1,6 @@
 {
   "name": "@sri-lanka/nic",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A lightweight library for parsing, validating, sanitizing, and converting Sri Lankan National Identity Card (NIC) numbers.",
   "author": "Vinod Liyanage <vinodliyanage.me>",
   "license": "MIT",
