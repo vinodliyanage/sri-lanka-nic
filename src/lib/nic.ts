@@ -105,9 +105,9 @@ export class NIC {
   static validate(nic: string) {
     const result = NIC.validator(nic);
 
-    if (result.success) return { valid: true };
+    if (result.success) return { valid: true as const };
 
-    return { valid: false, error: result.error };
+    return { valid: false as const, error: result.error };
   }
 
   /**
