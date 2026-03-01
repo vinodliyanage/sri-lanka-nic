@@ -6,33 +6,32 @@ export const INSTALL_SNIPPET_PNPM = `pnpm add ${name}`;
 
 export const QUICKSTART_SNIPPET = `import { NIC } from "${name}";
 
-const input = "911042754V";
-const result = NIC.validate(input);
+// Check validity
+NIC.valid("911042754V"); // true
+NIC.valid("invalid");    // false
 
-if (!result.valid && result.error) {
-  console.error(result.error.code);
-  console.error(result.error.message);
-} else {
-  const nic = NIC.parse(input);
-  console.log(nic.type); // "old"
-  console.log(nic.gender); // "male"
-  console.log(nic.parts.year); // "1991"
-  console.log(nic.birthday); // { year: 1991, month: 4, day: 14 }
-}`;
+// Parse and extract all data
+const nic = NIC.parse("911042754V");
+nic.value;    // "911042754V"
+nic.type;     // "old"
+nic.gender;   // "male"
+nic.birthday; // { year: 1991, month: 4, day: 14 }
+nic.age;      // 34
+nic.voter;    // true (null for new-format NICs)
+nic.parts;    // { year: "1991", days: "104", serial: "275", checkdigit: "4", letter: "V" }
 
-export const VALID_SNIPPET = `import { NIC } from "${name}";
+// Convert between formats
+nic.convert(); // "199110402754"
 
-const isValid = NIC.valid("911042754V"); // true
-const isInvalid = NIC.valid("invalid-nic"); // false`;
+// Validate with error details
+const result = NIC.validate("invalid");
+if (!result.valid) {
+  result.error.code;    // "INVALID_NIC_STRUCTURE"
+  result.error.message; // "Invalid NIC structure..."
+}
 
-export const VALIDATE_SNIPPET = `import { NIC } from "${name}";
-
-const result = NIC.validate("199100002757");
-
-if (!result.valid && result.error) {
-  console.log(result.error.code); // "INVALID_DAY_OF_YEAR"
-  console.log(result.error.message);
-}`;
+// Sanitize user input
+NIC.sanitize("  911042754v  "); // "911042754V"`;
 
 export const CONVERT_SNIPPET = `import { NIC } from "${name}";
 
@@ -44,11 +43,6 @@ console.log(oldNic.convert()); // "199110402754"
 const newNic = NIC.parse("199110402754");
 console.log(newNic.convert()); // "911042754V"`;
 
-export const SANITIZE_SNIPPET = `import { NIC } from "${name}";
-
-const cleaned = NIC.sanitize("   911042754v   ");
-console.log(cleaned); // "911042754V"`;
-
 export const ZOD_SNIPPET = `import { z } from "zod";
 import { NIC } from "${name}";
 
@@ -59,7 +53,7 @@ const schema = z.object({
     if (!result.valid) {
       ctx.addIssue({
         code: "custom",
-        message: result.error?.message ?? "Invalid NIC",
+        message: result.error.message,
       });
     }
   }),
@@ -75,7 +69,7 @@ const nicField = z
     if (!result.valid) {
       ctx.addIssue({
         code: "custom",
-        message: result.error?.message ?? "Invalid NIC",
+        message: result.error.message,
       });
     }
   })
@@ -161,7 +155,7 @@ export const API_STATIC_METHODS: ApiStaticMethodDoc[] = [
   },
   {
     call: "NIC.validate(nic)",
-    returns: "{ valid: boolean; error?: NIC.Error }",
+    returns: "{ valid: true } | { valid: false; error: NIC.Error }",
     throws: "Never",
     summary: "Validates input and returns structured validity details.",
     useCase: "Use this for form validation or APIs where you want error details without exceptions.",

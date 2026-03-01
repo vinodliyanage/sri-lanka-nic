@@ -8,9 +8,6 @@ import {
   CONVERT_SNIPPET,
   DEMO_TABS,
   QUICKSTART_SNIPPET,
-  SANITIZE_SNIPPET,
-  VALIDATE_SNIPPET,
-  VALID_SNIPPET,
   ZOD_SNIPPET,
   ZOD_TRANSFORM_SNIPPET,
 } from "./snippets";
@@ -40,7 +37,7 @@ const PROPERTY_LITERALS = {
 const nicSchema = z.string().superRefine((value, ctx) => {
   const result = NIC.validate(value);
 
-  if (!result.valid && result.error) {
+  if (!result.valid) {
     ctx.addIssue({
       code: "custom",
       message: result.error.message,
@@ -148,9 +145,7 @@ export default function App() {
                   type="button"
                   onClick={() => setView(tab.id)}
                   className={`px-6 py-2 rounded-md text-sm font-medium transition-all cursor-pointer ${
-                    view === tab.id
-                      ? "bg-accent/10 text-accent shadow-sm"
-                      : "text-text-muted hover:text-text-secondary"
+                    view === tab.id ? "bg-accent/10 text-accent shadow-sm" : "text-text-muted hover:text-text-secondary"
                   }`}
                 >
                   {tab.label}
@@ -176,26 +171,8 @@ export default function App() {
 
             <section className="mb-12">
               <h2 className="text-xl font-semibold mb-2 text-text-primary">Quick Start</h2>
-              <p className="text-text-secondary mb-4">
-                Validate and parse NIC values in a few lines. No setup required.
-              </p>
+              <p className="text-text-secondary mb-4">Everything you need in a few lines. No setup required.</p>
               <CodeBlock title="Quick Start" code={QUICKSTART_SNIPPET} />
-            </section>
-
-            <section className="mb-12">
-              <h2 className="text-xl font-semibold mb-2 text-text-primary">Quick Boolean Check</h2>
-              <p className="text-text-secondary mb-4">
-                Use <code>{CODE_LITERALS.valid}</code> when you only need a boolean result.
-              </p>
-              <CodeBlock title="Boolean Check" code={VALID_SNIPPET} />
-            </section>
-
-            <section className="mb-12">
-              <h2 className="text-xl font-semibold mb-2 text-text-primary">Detailed Validation Result</h2>
-              <p className="text-text-secondary mb-4">
-                Use <code>{CODE_LITERALS.validate}</code> to read structured error information without throwing.
-              </p>
-              <CodeBlock title="Validation Result" code={VALIDATE_SNIPPET} />
             </section>
 
             <div className="mb-12">
@@ -206,7 +183,9 @@ export default function App() {
 
               <div className="space-y-6">
                 <GlassCard>
-                  <h2 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">Parse & Validate</h2>
+                  <h2 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">
+                    Parse & Validate
+                  </h2>
                   <p className="text-text-muted text-xs mb-4">
                     Enter a NIC to inspect data from <code>{CODE_LITERALS.parse}</code>.
                   </p>
@@ -259,7 +238,11 @@ export default function App() {
                           <PropertyRow label={PROPERTY_LITERALS.age} value={String(parsedNic.age)} code />
                           <PropertyRow label={PROPERTY_LITERALS.partsYear} value={`"${parsedNic.parts.year}"`} code />
                           <PropertyRow label={PROPERTY_LITERALS.partsDays} value={`"${parsedNic.parts.days}"`} code />
-                          <PropertyRow label={PROPERTY_LITERALS.partsSerial} value={`"${parsedNic.parts.serial}"`} code />
+                          <PropertyRow
+                            label={PROPERTY_LITERALS.partsSerial}
+                            value={`"${parsedNic.parts.serial}"`}
+                            code
+                          />
                           <PropertyRow
                             label={PROPERTY_LITERALS.partsCheckDigit}
                             value={`"${parsedNic.parts.checkdigit}"`}
@@ -301,7 +284,9 @@ export default function App() {
 
                 <div className="grid gap-6 lg:grid-cols-2">
                   <GlassCard>
-                    <h2 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">Convert Format</h2>
+                    <h2 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">
+                      Convert Format
+                    </h2>
                     <p className="text-text-muted text-xs mb-3 sm:mb-4">
                       Switch formats using <code>{CODE_LITERALS.convert}</code>.
                     </p>
@@ -390,18 +375,8 @@ export default function App() {
             </section>
 
             <section className="mb-12">
-              <h2 className="text-xl font-semibold mb-2 text-text-primary">Input Sanitization</h2>
-              <p className="text-text-secondary mb-4">
-                Normalize raw input using <code>{CODE_LITERALS.sanitize}</code>.
-              </p>
-              <CodeBlock title="Sanitize API" code={SANITIZE_SNIPPET} />
-            </section>
-
-            <section className="mb-12">
               <h2 className="text-xl font-semibold mb-2 text-text-primary">Zod Validation & Parsing</h2>
-              <p className="text-text-secondary mb-4">
-                Integrate NIC checks in Zod with `superRefine`.
-              </p>
+              <p className="text-text-secondary mb-4">Integrate NIC checks in Zod with `superRefine`.</p>
               <CodeBlock title="Zod + NIC" code={ZOD_SNIPPET} />
               <div className="h-4" />
               <p className="text-text-secondary mb-4">You can also transform input directly into parsed NIC data.</p>

@@ -69,19 +69,32 @@ yarn add @sri-lanka/nic
 ```ts
 import { NIC } from "@sri-lanka/nic";
 
-const input = "911042754V";
-const result = NIC.validate(input);
+// Check validity
+NIC.valid("911042754V"); // true
+NIC.valid("invalid"); // false
 
-if (!result.valid && result.error) {
-  console.log(result.error.code);
-  console.log(result.error.message);
-} else {
-  const nic = NIC.parse(input);
-  console.log(nic.type); // "old"
-  console.log(nic.gender); // "male"
-  console.log(nic.parts.year); // "1991"
-  console.log(nic.birthday); // { year: 1991, month: 4, day: 14 }
+// Parse and extract all data
+const nic = NIC.parse("911042754V");
+nic.value; // "911042754V"
+nic.type; // "old"
+nic.gender; // "male"
+nic.birthday; // { year: 1991, month: 4, day: 14 }
+nic.age; // 34
+nic.voter; // true (null for new-format NICs)
+nic.parts; // { year: "1991", days: "104", serial: "275", checkdigit: "4", letter: "V" }
+
+// Convert between formats
+nic.convert(); // "199110402754"
+
+// Validate with error details
+const result = NIC.validate("invalid");
+if (!result.valid) {
+  result.error.code; // "INVALID_NIC_STRUCTURE"
+  result.error.message; // "Invalid NIC structure..."
 }
+
+// Sanitize user input
+NIC.sanitize("  911042754v  "); // "911042754V"
 ```
 
 ---
@@ -94,23 +107,6 @@ if (!result.valid && result.error) {
 2. Birth year bounds
 3. Day-of-year range with leap-year correctness
 4. Minimum legal age rule (default: 15 years)
-
-Use a quick boolean check:
-
-```ts
-NIC.valid("911042754V"); // true
-NIC.valid("invalid-nic"); // false
-```
-
-Use detailed validation:
-
-```ts
-const result = NIC.validate("199100002757");
-
-if (!result.valid && result.error) {
-  console.log(result.error.code); // "INVALID_DAY_OF_YEAR"
-}
-```
 
 ---
 
@@ -204,7 +200,7 @@ import { NIC } from "@sri-lanka/nic";
 const schema = z.object({
   nic: z.string().superRefine((value, ctx) => {
     const result = NIC.validate(value);
-    if (!result.valid && result.error) {
+    if (!result.valid) {
       ctx.addIssue({
         code: "custom",
         message: result.error.message,
@@ -218,14 +214,14 @@ const schema = z.object({
 
 ## Error Codes
 
-| Code | Description |
-| --- | --- |
-| `INVALID_NIC_STRUCTURE` | Input is not old-format or new-format NIC shape |
-| `MAXIMUM_AGE_REQUIREMENT_NOT_MET` | Birth year is older than configured lower bound |
-| `MINIMUM_AGE_REQUIREMENT_NOT_MET` | Person has not reached configured minimum legal age |
-| `INVALID_DAY_OF_YEAR` | Day-of-year is out of valid range for that birth year |
+| Code                                     | Description                                                     |
+| ---------------------------------------- | --------------------------------------------------------------- |
+| `INVALID_NIC_STRUCTURE`                  | Input is not old-format or new-format NIC shape                 |
+| `MAXIMUM_AGE_REQUIREMENT_NOT_MET`        | Birth year is older than configured lower bound                 |
+| `MINIMUM_AGE_REQUIREMENT_NOT_MET`        | Person has not reached configured minimum legal age             |
+| `INVALID_DAY_OF_YEAR`                    | Day-of-year is out of valid range for that birth year           |
 | `INVALID_YEAR_FOR_OLD_FORMAT_CONVERSION` | New NIC birth year is not in 19xx, cannot convert to old format |
-| `SERIAL_NUMBER_TOO_LARGE_FOR_OLD_FORMAT` | New NIC serial cannot fit the old-format serial width |
+| `SERIAL_NUMBER_TOO_LARGE_FOR_OLD_FORMAT` | New NIC serial cannot fit the old-format serial width           |
 
 ---
 
@@ -251,43 +247,39 @@ These settings affect validation behavior and related error messages.
 
 ### Static Methods
 
-| Method | Returns | Throws | Description |
-| --- | --- | --- | --- |
-| `NIC.parse(nic)` | `NIC` | `NIC.Error` | Parse and validate NIC |
-| `NIC.validate(nic)` | `{ valid: boolean; error?: NIC.Error }` | — | Validate without throwing |
-| `NIC.valid(nic)` | `boolean` | — | Boolean validation shortcut |
-| `NIC.sanitize(nic)` | `string` | `NIC.Error` | Normalize valid NIC input |
+| Method              | Returns                                                 | Throws      | Description                 |
+| ------------------- | ------------------------------------------------------- | ----------- | --------------------------- |
+| `NIC.parse(nic)`    | `NIC`                                                   | `NIC.Error` | Parse and validate NIC      |
+| `NIC.validate(nic)` | `{ valid: true } \| { valid: false; error: NIC.Error }` | —           | Validate without throwing   |
+| `NIC.valid(nic)`    | `boolean`                                               | —           | Boolean validation shortcut |
+| `NIC.sanitize(nic)` | `string`                                                | `NIC.Error` | Normalize valid NIC input   |
 
 ### Instance Properties
 
-| Property | Type | Description |
-| --- | --- | --- |
-| `.value` | `string` | Normalized NIC string |
-| `.type` | `NICType` | `"old"` or `"new"` |
-| `.gender` | `Gender` | `"male"` or `"female"` |
-| `.parts` | `{ year, days, serial, checkdigit, letter }` | Raw extracted segments |
-| `.birthday` | `{ year, month, day }` | Computed birthday |
-| `.age` | `number` | Computed age |
-| `.voter` | `boolean \| null` | Voter state for old NICs; `null` for new |
+| Property    | Type                                         | Description                              |
+| ----------- | -------------------------------------------- | ---------------------------------------- |
+| `.value`    | `string`                                     | Normalized NIC string                    |
+| `.type`     | `NICType`                                    | `"old"` or `"new"`                       |
+| `.gender`   | `Gender`                                     | `"male"` or `"female"`                   |
+| `.parts`    | `{ year, days, serial, checkdigit, letter }` | Raw extracted segments                   |
+| `.birthday` | `{ year, month, day }`                       | Computed birthday                        |
+| `.age`      | `number`                                     | Computed age                             |
+| `.voter`    | `boolean \| null`                            | Voter state for old NICs; `null` for new |
 
 ### Instance Methods
 
-| Method | Returns | Description |
-| --- | --- | --- |
-| `.convert()` | `string` | Convert between old and new formats |
-| `.toString()` | `string` | Return normalized NIC string |
-| `.toJSON()` | `{ nic, type, gender, birthday, age, voter, parts }` | Return serializable summary |
+| Method        | Returns                                              | Description                         |
+| ------------- | ---------------------------------------------------- | ----------------------------------- |
+| `.convert()`  | `string`                                             | Convert between old and new formats |
+| `.toString()` | `string`                                             | Return normalized NIC string        |
+| `.toJSON()`   | `{ nic, type, gender, birthday, age, voter, parts }` | Return serializable summary         |
 
 ---
 
 ## Named Exports
 
 ```ts
-import {
-  NIC,
-  NICType,
-  Gender,
-} from "@sri-lanka/nic";
+import { NIC, NICType, Gender } from "@sri-lanka/nic";
 ```
 
 `NIC.Error` and `NIC.Config` are available via the `NIC` class.
