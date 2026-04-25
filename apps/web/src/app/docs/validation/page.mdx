@@ -41,6 +41,16 @@ try {
 }
 ```
 
+## Validation Pipeline Order
+
+When you parse or validate a NIC, the library executes checks in a very specific order:
+
+1. **Sanitization**: Trims whitespace and converts trailing letters to uppercase.
+2. **Structural Validation**: Tests the string against strict Regular Expressions to ensure it is exactly 12 digits or 9 digits plus V/X.
+3. **Extraction**: Calculates the `year` and `days` from the raw string.
+4. **Logic Validations**: Verifies that the days correspond to a real day in that specific birth year, and that the computed age falls within the permitted minimum/maximum limits.
+5. **Custom Validation (`check` callback)**: Finally, if you provided a `check` function in the config, it executes your custom rules. This guarantees your custom function only runs if the NIC is structurally and mathematically sound.
+
 ## What Gets Validated
 
 The library checks these things automatically:
