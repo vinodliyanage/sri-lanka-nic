@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 interface SidebarProps {
   docs: { title: string; slug: string }[];
+  className?: string;
 }
 
-export function Sidebar({ docs }: SidebarProps) {
+export function Sidebar({ docs, className = "w-56 shrink-0" }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <nav className="w-56 shrink-0">
+    <nav className={className}>
       <ul className="space-y-0.5">
         {docs.map((doc) => {
           const href = `/docs/${doc.slug}`;
