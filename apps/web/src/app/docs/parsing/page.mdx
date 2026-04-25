@@ -1,0 +1,95 @@
+export const metadata = {
+  title: "Parsing",
+  description: "Parse NIC strings into structured data.",
+};
+
+# Parsing
+
+Use `NIC.parse()` to extract all the information encoded in a NIC string.
+
+## Basic Usage
+
+```typescript
+import { NIC } from "@sri-lanka/nic";
+
+const result = NIC.parse("901404567V");
+
+console.log(result.value); // "901404567V"
+console.log(result.type); // "OLD"
+console.log(result.gender); // "MALE"
+console.log(result.birthday); // { year: 1990, month: 5, day: 20 }
+console.log(result.age); // calculated from current date
+```
+
+## Auto-Sanitization
+
+Input is automatically trimmed and converted to uppercase:
+
+```typescript
+NIC.parse("  901404567v  ");
+// Same as NIC.parse("901404567V")
+```
+
+You can also sanitize manually:
+
+```typescript
+NIC.sanitize("  901404567v  "); // "901404567V"
+```
+
+## Format Detection
+
+The library auto-detects the NIC format:
+
+- **New format**: 12 digits (e.g., `200001501234`)
+- **Old format**: 9 digits + V or X (e.g., `901404567V`)
+
+You can check the format without parsing:
+
+```typescript
+NIC.getType("200001501234"); // "NEW"
+NIC.getType("901404567V"); // "OLD"
+NIC.getType("invalid"); // throws NICError
+```
+
+## Raw Parts
+
+Access the raw string slices from the NIC:
+
+```typescript
+const { parts } = NIC.parse("200001501234");
+
+parts.year; // "2000"
+parts.days; // "015"
+parts.serial; // "0123"
+parts.checkdigit; // "4"
+parts.letter; // null (new format has no letter)
+```
+
+For old format NICs:
+
+```typescript
+const { parts } = NIC.parse("901404567V");
+
+parts.year; // "1990" (prepended "19")
+parts.days; // "140"
+parts.serial; // "456"
+parts.checkdigit; // "7"
+parts.letter; // "V"
+```
+
+## Format Conversion
+
+Convert between old and new formats:
+
+```typescript
+// Old → New
+const old = NIC.parse("901404567V");
+old.convert(); // "199014004567"
+
+// New → Old
+const nic = NIC.parse("199014004567");
+nic.convert(); // "901404567V" (default letter: V)
+nic.convert({ letter: "X" }); // "901404567X"
+```
+
+> **Note**: Not all new NICs can be converted to old format. The year must be 19XX and the serial must be 3 digits or fewer.

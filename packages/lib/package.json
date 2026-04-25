@@ -1,0 +1,59 @@
+{
+  "name": "@sri-lanka/nic",
+  "version": "1.0.0",
+  "description": "Parse, validate, and build Sri Lankan National Identity Card (NIC) numbers",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "sri-lanka",
+    "nic",
+    "national-identity-card",
+    "validator",
+    "parser",
+    "builder"
+  ],
+  "author": {
+    "name": "Vinod Liyanage",
+    "url": "https://www.vinodliyanage.me"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinodliyanage/sri-lanka-nic.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vinodliyanage/sri-lanka-nic/issues"
+  },
+  "homepage": "https://nic.vinodliyanage.me",
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.0.0"
+  }
+}

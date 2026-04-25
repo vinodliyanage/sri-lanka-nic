@@ -1,0 +1,70 @@
+export const metadata = {
+  title: "Errors",
+  description: "Error types and messages thrown by the library.",
+};
+
+# Errors
+
+All errors thrown by the library are instances of `NICError`, which extends the native `Error` class.
+
+## `NICError`
+
+```typescript
+import { NICError } from "@sri-lanka/nic";
+
+try {
+  NIC.parse("invalid");
+} catch (error) {
+  error instanceof NICError; // true
+  error instanceof Error; // true
+  error.name; // "NICError"
+  error.message; // "Invalid NIC structure"
+}
+```
+
+## Error Messages
+
+| Message                                  | When it's thrown                                                |
+| ---------------------------------------- | --------------------------------------------------------------- |
+| `Invalid NIC structure`                  | The NIC doesn't match either 12-digit or 9-digit+letter pattern |
+| `Minimum age requirement not met`        | The person is younger than the minimum age (default: 15)        |
+| `Maximum age requirement not met`        | The person is older than the maximum age                        |
+| `Invalid day of year`                    | The day-of-year value is out of range (not 1–365/366)           |
+| `Invalid year for old format conversion` | Trying to convert a 20XX NIC to old format                      |
+| `Serial number too large for old format` | The serial number can't fit in old format (more than 3 digits)  |
+
+## Catching Errors
+
+The recommended pattern:
+
+```typescript
+import { NIC, NICError } from "@sri-lanka/nic";
+
+try {
+  const result = NIC.parse(userInput);
+  // use result
+} catch (error) {
+  if (error instanceof NICError) {
+    // Show error.message to the user
+    console.log(error.message);
+  } else {
+    // Unexpected error — re-throw
+    throw error;
+  }
+}
+```
+
+## With `NIC.valid()`
+
+If you don't want to deal with try/catch, use `NIC.valid()`:
+
+```typescript
+if (NIC.valid(userInput)) {
+  const result = NIC.parse(userInput);
+  // safe to use
+} else {
+  // invalid NIC
+}
+```
+
+> **Note**: `NIC.valid()` catches `NICError` only. If your custom `check` function throws a `TypeError` or other non-NICError exception, it will still propagate.

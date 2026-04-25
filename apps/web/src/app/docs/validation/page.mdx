@@ -1,0 +1,79 @@
+export const metadata = {
+  title: "Validation",
+  description: "Validate NIC strings with built-in and custom rules.",
+};
+
+# Validation
+
+The library provides three ways to validate NIC numbers, each suited for different use cases.
+
+## `NIC.validate()`
+
+Throws a `NICError` if the NIC is invalid. Use this when you want to halt execution on bad input:
+
+```typescript
+import { NIC } from "@sri-lanka/nic";
+
+NIC.validate("901404567V"); // passes silently
+NIC.validate("invalid"); // throws NICError: "Invalid NIC structure"
+```
+
+## `NIC.valid()`
+
+Returns `true` or `false` without throwing. Perfect for form validation:
+
+```typescript
+NIC.valid("901404567V"); // true
+NIC.valid("invalid"); // false
+```
+
+> **Tip**: `NIC.valid()` only catches `NICError`. If your custom `check` function throws a different error type (like `TypeError`), it will still propagate.
+
+## `NIC.parse()`
+
+Parsing also validates. If the NIC is invalid, `.parse()` throws before returning any data:
+
+```typescript
+try {
+  const result = NIC.parse("invalid");
+} catch (error) {
+  // NICError: "Invalid NIC structure"
+}
+```
+
+## What Gets Validated
+
+The library checks these things automatically:
+
+1. **Structure** — Must match either 12-digit or 9-digit+letter pattern
+2. **Day of year** — Must be between 1 and 365 (or 366 for leap years)
+3. **Minimum age** — Default: 15 (legal age to hold a NIC)
+4. **Maximum age** — Default: current year minus 1900
+5. **Birth year range** — Must fall within the valid range for the NIC format
+
+## What is NOT Validated
+
+Because this library runs purely offline mathematical checks, it **does not**:
+
+- **Check against government databases** — It cannot verify if a NIC has actually been issued to a real person.
+- **Verify the serial number or letter** — The serial number indicates the sequence of issue, and the trailing letter (V/X) indicates voter status. These cannot be validated offline.
+- **Verify the check digit** — The exact modulo algorithm used by the Department for Registration of Persons to calculate the final digit is not public. The library ensures it is a number, but cannot verify if it is mathematically correct.
+
+## Error Handling
+
+All validation errors are instances of `NICError`:
+
+```typescript
+import { NIC, NICError } from "@sri-lanka/nic";
+
+try {
+  NIC.parse("invalid");
+} catch (error) {
+  if (error instanceof NICError) {
+    console.log(error.message); // "Invalid NIC structure"
+    console.log(error.name); // "NICError"
+  }
+}
+```
+
+See the [Errors](/docs/errors) page for a full list of error messages.

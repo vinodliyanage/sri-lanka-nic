@@ -1,0 +1,76 @@
+export const metadata = {
+  title: "Utilities",
+  description:
+    "Helper functions for sanitizing, detecting type, generating random NICs, and format conversion.",
+};
+
+# Utilities
+
+These are standalone helper methods on the `NIC` object.
+
+## `NIC.sanitize()`
+
+Trims whitespace and converts to uppercase:
+
+```typescript
+import { NIC } from "@sri-lanka/nic";
+
+NIC.sanitize("  901404567v  "); // "901404567V"
+NIC.sanitize("200001501234"); // "200001501234"
+```
+
+## `NIC.getType()`
+
+Detects the NIC format without parsing:
+
+```typescript
+NIC.getType("200001501234"); // "NEW"
+NIC.getType("901404567V"); // "OLD"
+```
+
+Throws `NICError` if the string doesn't match any valid format.
+
+## `NIC.random()`
+
+Generates a random, valid NIC string. Randomly picks between old and new format:
+
+```typescript
+NIC.random(); // e.g., "199516600150" or "901404567V"
+NIC.random(); // different each time
+```
+
+Every generated NIC is guaranteed to pass `NIC.parse()`:
+
+```typescript
+for (let i = 0; i < 100; i++) {
+  const nic = NIC.random();
+  console.log(NIC.parse(nic)); // always works
+}
+```
+
+## Format Conversion
+
+Convert between old and new NIC formats using `.convert()` on a parsed NIC:
+
+```typescript
+// Old → New
+const old = NIC.parse("901404567V");
+old.convert(); // "199014004567"
+
+// New → Old (default letter: V)
+const nic = NIC.parse("199014004567");
+nic.convert(); // "901404567V"
+nic.convert({ letter: "X" }); // "901404567X"
+```
+
+### Conversion Limits
+
+Not all NICs can be converted:
+
+- **New → Old**: Year must be 19XX (not 20XX). Serial must fit in 3 digits.
+- **Old → New**: Always works (just prepends the century and pads the serial).
+
+```typescript
+const nic = NIC.parse("200001501234");
+nic.convert(); // throws: "Invalid year for old format conversion"
+```

@@ -1,0 +1,93 @@
+export const metadata = {
+  title: "Builder",
+  description: "Generate valid NIC strings programmatically.",
+};
+
+# Builder
+
+The builder API lets you generate valid NIC strings step-by-step. Useful for testing, seeding databases, or any scenario where you need realistic NIC numbers.
+
+## New NIC Builder
+
+Create a 12-digit NIC:
+
+```typescript
+import { NIC, Gender } from "@sri-lanka/nic";
+
+const nic = NIC.builder
+  .new()
+  .birthday({ year: 1995, month: 6, day: 15 })
+  .gender(Gender.MALE)
+  .build();
+
+console.log(nic); // "199516600150" (example)
+```
+
+## Old NIC Builder
+
+Create a 9-digit + letter NIC:
+
+```typescript
+const nic = NIC.builder
+  .old()
+  .birthday({ year: 1990, month: 5, day: 20 })
+  .gender(Gender.MALE)
+  .letter("V")
+  .build();
+
+console.log(nic); // "901404567V" (example)
+```
+
+## Chainable Methods
+
+Both builders share these methods:
+
+| Method                                  | Description                          |
+| --------------------------------------- | ------------------------------------ |
+| `.birthday({ year, month, day })`       | Set the date of birth                |
+| `.gender(Gender.MALE \| Gender.FEMALE)` | Set the gender                       |
+| `.serial(string)`                       | Set the serial number                |
+| `.checkdigit(string)`                   | Set the check digit                  |
+| `.build()`                              | Generate and validate the NIC string |
+
+The old NIC builder has extra methods:
+
+| Method                | Description                            |
+| --------------------- | -------------------------------------- |
+| `.letter("V" \| "X")` | Set the trailing letter                |
+| `.voter(boolean)`     | Shortcut — `true` for V, `false` for X |
+
+## Random Defaults
+
+If you don't set a value, the builder fills it with a random valid value. So the simplest way to generate a NIC is:
+
+```typescript
+// Random new NIC
+NIC.builder.new().build();
+
+// Random old NIC
+NIC.builder.old().build();
+
+// Or use the shorthand
+NIC.random(); // randomly picks new or old
+```
+
+## With Age
+
+Set the birth year by age instead of birthday:
+
+```typescript
+const nic = NIC.builder.new().age(30).gender(Gender.FEMALE).build();
+```
+
+## Builder Config
+
+Pass config to enforce constraints on the built NIC:
+
+```typescript
+const nic = NIC.builder
+  .new({ minimumAge: 18, maximumAge: 65 })
+  .birthday({ year: 2005, month: 1, day: 1 })
+  .gender(Gender.MALE)
+  .build(); // throws if age constraints aren't met
+```

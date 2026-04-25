@@ -1,0 +1,109 @@
+export const metadata = {
+  title: "Types",
+  description: "TypeScript type reference for @sri-lanka/nic.",
+};
+
+# Types
+
+All types are exported from the package and can be imported directly:
+
+```typescript
+import type { PublicNIC, NICConfig, NICType, Gender, Birthday } from "@sri-lanka/nic";
+```
+
+## Enums
+
+### `NICType`
+
+The NIC format type:
+
+```typescript
+enum NICType {
+  OLD = "OLD", // 9 digits + V/X
+  NEW = "NEW", // 12 digits
+}
+```
+
+### `Gender`
+
+```typescript
+enum Gender {
+  MALE = "MALE",
+  FEMALE = "FEMALE",
+}
+```
+
+## Interfaces
+
+### `PublicNIC`
+
+The object returned by `NIC.parse()`:
+
+```typescript
+interface PublicNIC {
+  value: string; // Sanitized NIC string
+  type: NICType; // "NEW" or "OLD"
+  gender: Gender; // "MALE" or "FEMALE"
+  birthday: { year: number; month: number; day: number };
+  age: number; // Current age
+  parts: RawNICParts; // Raw string slices
+  convert(options?: { letter?: "V" | "X" }): string;
+}
+```
+
+### `RawNICParts`
+
+The raw string slices from the NIC:
+
+```typescript
+interface RawNICParts {
+  year: string; // "2000" or "1990"
+  days: string; // "015" or "140"
+  serial: string; // "0123" or "456"
+  checkdigit: string; // "4" or "7"
+  letter: string | null; // "V", "X", or null
+}
+```
+
+### `Birthday`
+
+```typescript
+interface Birthday {
+  year: number;
+  month: number;
+  day: number;
+}
+```
+
+### `NICConfig`
+
+Options for parsing and validation:
+
+```typescript
+interface NICConfig {
+  minimumAge?: number;
+  maximumAge?: number;
+  minimumBirthYear?: number;
+  maximumBirthYear?: number;
+  check?: (nic: PublicNIC, NICError: typeof NICError) => void;
+}
+```
+
+### `NICAPI`
+
+The shape of the main `NIC` object:
+
+```typescript
+interface NICAPI {
+  parse(nic: string, options?: NICConfig): PublicNIC;
+  validate(nic: string, options?: NICConfig): void;
+  valid(nic: string, options?: NICConfig): boolean;
+  sanitize(nic: string): string;
+  getType(nic: string): NICType;
+  builder: {
+    new: (config?: NICConfig) => NICBuilder;
+    old: (config?: NICConfig) => OldNICBuilderContract;
+  };
+  random(): string;
+}
+```

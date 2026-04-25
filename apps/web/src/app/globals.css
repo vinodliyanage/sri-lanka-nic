@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: var(--theme-bg);
+  --color-bg-secondary: var(--theme-bg-secondary);
+  --color-bg-code: var(--theme-bg-code);
+  --color-text: var(--theme-text);
+  --color-text-secondary: var(--theme-text-secondary);
+  --color-text-muted: var(--theme-text-muted);
+  --color-border: var(--theme-border);
+  --color-border-strong: var(--theme-border-strong);
+  --color-accent: var(--theme-accent);
+  --color-accent-light: var(--theme-accent-light);
+  --color-surface: var(--theme-surface);
+  --color-surface-hover: var(--theme-surface-hover);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+:root {
+  --theme-bg: #fafafa;
+  --theme-bg-secondary: #f4f4f5;
+  --theme-bg-code: #18181b;
+  --theme-text: #18181b;
+  --theme-text-secondary: #71717a;
+  --theme-text-muted: #a1a1aa;
+  --theme-border: #e4e4e7;
+  --theme-border-strong: #d4d4d8;
+  --theme-accent: #8b1a1a;
+  --theme-accent-light: #fef2f2;
+  --theme-surface: #ffffff;
+  --theme-surface-hover: #f9fafb;
+}
+
+.dark {
+  --theme-bg: #09090b;
+  --theme-bg-secondary: #18181b;
+  --theme-bg-code: #000000;
+  --theme-text: #fafafa;
+  --theme-text-secondary: #a1a1aa;
+  --theme-text-muted: #71717a;
+  --theme-border: #27272a;
+  --theme-border-strong: #3f3f46;
+  --theme-accent: #f87171; /* A lighter maroon/red for dark mode */
+  --theme-accent-light: #450a0a;
+  --theme-surface: #09090b;
+  --theme-surface-hover: #18181b;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    line-height: 1.7;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: white;
+  }
+}
+
+/* Code block styles */
+pre {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-code) !important;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  border: none;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background-color: var(--color-bg-secondary);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  color: var(--color-accent);
+  border: 1px solid var(--color-border);
+}
+
+/* Rehype pretty-code styles */
+[data-rehype-pretty-code-figure] pre {
+  padding: 1rem 0;
+}
+
+[data-rehype-pretty-code-figure] code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.875rem;
+}
+
+[data-rehype-pretty-code-figure] [data-line] {
+  padding: 0 1.25rem;
+}
+
+[data-rehype-pretty-code-figure] [data-highlighted-line] {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}

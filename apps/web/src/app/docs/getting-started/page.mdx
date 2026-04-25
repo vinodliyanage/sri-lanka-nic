@@ -1,0 +1,73 @@
+export const metadata = {
+  title: "Getting Started",
+  description: "Install @sri-lanka/nic and parse your first NIC number.",
+};
+
+# Getting Started
+
+## Installation
+
+Install the package using your preferred package manager:
+
+```bash
+# npm
+npm install @sri-lanka/nic
+
+# pnpm
+pnpm add @sri-lanka/nic
+
+# yarn
+yarn add @sri-lanka/nic
+```
+
+## Your First Parse
+
+Import `NIC` and call `.parse()` with any Sri Lankan NIC string:
+
+```typescript
+import { NIC } from "@sri-lanka/nic";
+
+const result = NIC.parse("200001501234");
+
+console.log(result.type); // "NEW"
+console.log(result.gender); // "MALE"
+console.log(result.birthday); // { year: 2000, month: 1, day: 15 }
+console.log(result.age); // 25 (depends on current date)
+```
+
+That's it. The library auto-detects the NIC format (old or new), validates it, and returns the parsed details.
+
+## What You Get Back
+
+The `.parse()` method returns an object with these properties:
+
+| Property   | Type       | Description                              |
+| ---------- | ---------- | ---------------------------------------- |
+| `value`    | `string`   | The sanitized NIC string                 |
+| `type`     | `NICType`  | `"NEW"` (12-digit) or `"OLD"` (9+letter) |
+| `gender`   | `Gender`   | `"MALE"` or `"FEMALE"`                   |
+| `birthday` | `object`   | `{ year, month, day }`                   |
+| `age`      | `number`   | Current age (Sri Lanka time)             |
+| `parts`    | `object`   | Raw NIC string slices                    |
+| `convert`  | `function` | Convert to the other format              |
+
+## Quick Validation
+
+If you just want to check whether a NIC is valid:
+
+```typescript
+// Throws NICError if invalid
+NIC.validate("901404567V");
+
+// Returns true/false, never throws
+NIC.valid("901404567V"); // true
+NIC.valid("invalid"); // false
+```
+
+## TypeScript
+
+The library is written in TypeScript. All types are exported:
+
+```typescript
+import type { PublicNIC, NICConfig, NICType, Gender } from "@sri-lanka/nic";
+```

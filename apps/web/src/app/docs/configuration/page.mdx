@@ -1,0 +1,86 @@
+export const metadata = {
+  title: "Configuration",
+  description: "Customize validation rules with NICConfig options.",
+};
+
+# Configuration
+
+You can pass a config object to `NIC.parse()`, `NIC.validate()`, or `NIC.valid()` to customize validation behavior.
+
+## Options
+
+```typescript
+interface NICConfig {
+  minimumAge?: number;
+  maximumAge?: number;
+  minimumBirthYear?: number;
+  maximumBirthYear?: number;
+  check?: (nic: NICInstance, NICError: typeof NICError) => void;
+}
+```
+
+## Age Constraints
+
+Override the default age limits:
+
+```typescript
+import { NIC } from "@sri-lanka/nic";
+
+// Only accept NICs from people aged 18–65
+NIC.parse("901404567V", {
+  minimumAge: 18,
+  maximumAge: 65,
+});
+```
+
+**Defaults:**
+
+| Option       | Default                        |
+| ------------ | ------------------------------ |
+| `minimumAge` | `15` (legal age to hold a NIC) |
+| `maximumAge` | Current year minus 1900        |
+
+## Birth Year Constraints
+
+Restrict the accepted birth year range:
+
+```typescript
+NIC.parse("901404567V", {
+  minimumBirthYear: 1950,
+  maximumBirthYear: 2005,
+});
+```
+
+**Defaults:**
+
+| Option             | New NIC               | Old NIC |
+| ------------------ | --------------------- | ------- |
+| `minimumBirthYear` | `1900`                | `1900`  |
+| `maximumBirthYear` | Current year minus 15 | `1999`  |
+
+## Custom Validation
+
+Add your own rules with the `check` function. It runs after all built-in checks pass:
+
+```typescript
+NIC.parse("200001501234", {
+  check(nic, NICError) {
+    // Only accept female NICs
+    if (nic.gender !== "FEMALE") {
+      throw new NICError("Only female NICs are accepted");
+    }
+
+    // Only accept people born after 1990
+    if (nic.birthday.year < 1990) {
+      throw new NICError("Birth year must be 1990 or later");
+    }
+  },
+});
+```
+
+The `check` function receives:
+
+1. **`nic`** — The parsed NIC object (same shape as what `.parse()` returns)
+2. **`NICError`** — The error class to throw (so you get consistent error types)
+
+> **Note**: The `check` function only runs if all built-in validations pass first. If the NIC structure is invalid, your function won't be called.

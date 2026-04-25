@@ -1,0 +1,176 @@
+export const metadata = {
+  title: "Examples",
+  description: "Real-world usage examples with Zod, React Hook Form, and more.",
+};
+
+# Examples
+
+Practical examples showing how to use `@sri-lanka/nic` in real applications.
+
+## With Zod
+
+Create a Zod schema that validates NIC strings:
+
+```typescript
+import { z } from "zod";
+import { NIC, NICError } from "@sri-lanka/nic";
+
+const nicSchema = z.string().refine((value) => NIC.valid(value), { message: "Invalid NIC number" });
+
+// Use it
+nicSchema.parse("901404567V"); // ✅ passes
+nicSchema.parse("invalid"); // ❌ throws ZodError
+```
+
+### With Custom Constraints
+
+```typescript
+const adultNicSchema = z.string().refine(
+  (value) => {
+    try {
+      NIC.parse(value, { minimumAge: 18 });
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  { message: "Must be a valid NIC of someone 18 or older" },
+);
+```
+
+### Extracting Parsed Data
+
+Use `.transform()` to return parsed NIC data instead of just the string:
+
+```typescript
+const nicWithDetails = z.string().transform((value, ctx) => {
+  try {
+    return NIC.parse(value);
+  } catch (error) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: error instanceof NICError ? error.message : "Invalid NIC",
+    });
+    return z.NEVER;
+  }
+});
+
+const result = nicWithDetails.parse("901404567V");
+console.log(result.gender); // "MALE"
+console.log(result.birthday); // { year: 1990, month: 5, day: 20 }
+```
+
+---
+
+## With React Hook Form
+
+### Basic Validation
+
+```tsx
+import { useForm } from "react-hook-form";
+import { NIC } from "@sri-lanka/nic";
+
+function NICForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => {
+    const parsed = NIC.parse(data.nic);
+    console.log(parsed);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input
+        {...register("nic", {
+          required: "NIC is required",
+          validate: (value) => NIC.valid(value) || "Invalid NIC number",
+        })}
+        placeholder="Enter NIC"
+      />
+      {errors.nic && <span>{errors.nic.message}</span>}
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+### With Zod Resolver
+
+Combine Zod and React Hook Form for the best of both worlds:
+
+```tsx
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { NIC, NICError } from "@sri-lanka/nic";
+
+const schema = z.object({
+  nic: z
+    .string()
+    .min(1, "NIC is required")
+    .refine((value) => NIC.valid(value), { message: "Invalid NIC number" }),
+});
+
+type FormData = z.infer<typeof schema>;
+
+function NICForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = (data: FormData) => {
+    const parsed = NIC.parse(data.nic);
+    console.log(parsed.birthday, parsed.gender);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register("nic")} placeholder="Enter NIC" />
+      {errors.nic && <span>{errors.nic.message}</span>}
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+### Auto-Fill From NIC
+
+Parse the NIC on change and auto-fill other form fields:
+
+```tsx
+import { useForm } from "react-hook-form";
+import { NIC } from "@sri-lanka/nic";
+
+function RegistrationForm() {
+  const { register, setValue, watch } = useForm();
+  const nicValue = watch("nic");
+
+  const handleNICChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (NIC.valid(value)) {
+      const parsed = NIC.parse(value);
+      setValue("gender", parsed.gender);
+      setValue("birthYear", parsed.birthday.year);
+      setValue("birthMonth", parsed.birthday.month);
+      setValue("birthDay", parsed.birthday.day);
+      setValue("age", parsed.age);
+    }
+  };
+
+  return (
+    <form>
+      <input {...register("nic")} onChange={handleNICChange} placeholder="NIC" />
+      <input {...register("gender")} placeholder="Gender" readOnly />
+      <input {...register("age")} placeholder="Age" readOnly />
+    </form>
+  );
+}
+```
