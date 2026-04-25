@@ -38,6 +38,9 @@ jobs:
       - name: Run Library Tests
         run: pnpm --filter @sri-lanka/nic test
 
+      - name: Build Core Library
+        run: pnpm --filter @sri-lanka/nic build
+
       - name: Build Web Application
         run: pnpm --filter web build
 
