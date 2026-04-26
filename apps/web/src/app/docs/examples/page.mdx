@@ -15,7 +15,10 @@ Create a Zod schema that validates NIC strings:
 import { z } from "zod";
 import { NIC, NICError } from "@sri-lanka/nic";
 
-const nicSchema = z.string().refine((value) => NIC.valid(value), { message: "Invalid NIC number" });
+const nicSchema = z.string().refine(
+  (value) => NIC.valid(value), 
+  { message: "Invalid NIC number" }
+);
 
 // Use it
 nicSchema.parse("901404567V"); // ✅ passes
@@ -26,14 +29,7 @@ nicSchema.parse("invalid"); // ❌ throws ZodError
 
 ```typescript
 const adultNicSchema = z.string().refine(
-  (value) => {
-    try {
-      NIC.parse(value, { minimumAge: 18 });
-      return true;
-    } catch {
-      return false;
-    }
-  },
+  (value) => NIC.valid(value, { minimumAge: 18 }),
   { message: "Must be a valid NIC of someone 18 or older" },
 );
 ```
