@@ -1,4 +1,5 @@
 import Link from "next/link";
+import packageJson from "@sri-lanka/nic/package.json";
 import { NICDecoder } from "@/components/nic-decoder";
 import { NICBuilder } from "@/components/nic-builder";
 import { ArrowRight, Globe } from "lucide-react";
@@ -62,7 +63,7 @@ export default function Home() {
       <section className="text-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs text-text-secondary">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          v1.0.0
+          v{packageJson.version}
         </div>
 
         <h1 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl">@sri-lanka/nic</h1>
@@ -83,11 +84,10 @@ export default function Home() {
           ))}
         </div>
 
-        <p className="mt-3 text-text-secondary text-base leading-relaxed">
-          Parse, validate, and build Sri Lankan National Identity Card numbers.
-          <br className="hidden sm:block" />
-          Zero dependencies. TypeScript. Works everywhere.
-        </p>
+        <div className="mt-4 flex flex-col gap-1 text-text-secondary text-base leading-relaxed">
+          <p>Parse, validate, and build Sri Lankan National Identity Card numbers.</p>
+          <p>Zero dependencies. TypeScript. Works everywhere.</p>
+        </div>
 
         <div className="mt-6 flex items-center justify-center gap-3">
           <div className="flex items-center gap-2 rounded-lg border border-border bg-bg-secondary px-3.5 py-2 font-mono text-sm">
@@ -105,7 +105,7 @@ export default function Home() {
         </div>
 
         {/* Badges */}
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           {BADGES.map((badge) => (
             <img key={badge.alt} src={badge.src} alt={badge.alt} height={20} />
           ))}
