@@ -45,7 +45,7 @@ export function Navbar() {
             href={siteConfig.links.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-text-secondary transition-colors hover:text-text"
+            className="text-text-secondary transition-colors hover:text-text "
             aria-label="GitHub repo"
           >
             <GithubIcon size={18} />
