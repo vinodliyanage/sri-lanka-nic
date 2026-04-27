@@ -48,7 +48,7 @@ const BADGES = [
   },
   {
     alt: "bundle size",
-    src: "https://img.shields.io/bundlephobia/minzip/@sri-lanka/nic?style=flat-square&label=size",
+    src: "https://img.badgesize.io/https://unpkg.com/@sri-lanka/nic/dist/index.js?compression=gzip&style=flat-square&label=size&color=cb3837",
   },
   {
     alt: "license",
