@@ -1,13 +1,16 @@
-name: Publish to NPM
+name: Publish
 
 on:
-  release:
-    types: [published]
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
-  contents: read
-  id-token: write 
+  contents: write
+  pull-requests: write
+  id-token: write
 
 jobs:
   publish:
@@ -31,9 +34,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build Library
-        run: pnpm --filter @sri-lanka/nic build
-
-      - name: Publish to NPM (with Provenance)
-        # The --provenance flag tells NPM to use the OIDC token from GitHub Actions
-        run: pnpm --filter @sri-lanka/nic publish --access public --provenance --no-git-checks
+      - name: Create Release Pull Request or Publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: pnpm run release
+          version: pnpm run version-packages
+          commit: "chore(release): version packages"
+          title: "chore(release): version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
