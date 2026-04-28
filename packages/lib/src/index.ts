@@ -13,10 +13,7 @@ export type {
 } from "./core";
 
 export { NewNICBuilder, OldNICBuilder } from "./builder";
-export type {
-  NICState,
-  OldNICState,
-} from "./builder/builder.types";
+export type { NICState, OldNICState } from "./builder/builder.types";
 
 export { NICType, Gender, NICError, daylk, errors, MINIMUM_LEGAL_AGE_TO_HAVE_NIC } from "./common";
 export type { Birthday } from "./common";

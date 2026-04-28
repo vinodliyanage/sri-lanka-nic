@@ -41,7 +41,7 @@ export class OldNICBuilder extends BaseNICBuilder<OldNICState> {
     if (!LETTER_REGXP.test(letter)) {
       throw new NICError("Invalid letter");
     }
-    
+
     this.state.letter = letter.toUpperCase() as NICLetter;
     return this;
   }

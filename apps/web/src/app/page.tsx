@@ -62,8 +62,8 @@ export default function Home() {
       {/* Hero */}
       <section className="text-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs text-text-secondary">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          v{packageJson.version}
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />v
+          {packageJson.version}
         </div>
 
         <h1 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl">@sri-lanka/nic</h1>

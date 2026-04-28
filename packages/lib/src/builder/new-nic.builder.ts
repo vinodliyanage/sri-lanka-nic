@@ -19,7 +19,7 @@ export class NewNICBuilder extends BaseNICBuilder<NICState> {
    * @param serial - A 4-digit string (e.g., "0001", "9999").
    * @example builder.serial("1234")
    */
-   serial(serial: string) {
+  serial(serial: string) {
     const SERIAL_REGXP = /^\d{4}$/;
 
     if (!SERIAL_REGXP.test(serial)) {

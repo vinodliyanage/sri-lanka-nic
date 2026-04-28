@@ -14,8 +14,7 @@ export abstract class BaseNICBuilder<TState extends NICState> {
    */
   public abstract build(): string;
 
-  constructor(protected config: NICConfig = {}) { }
- 
+  constructor(protected config: NICConfig = {}) {}
 
   /**
    * Sets the check digit.
