@@ -31,6 +31,10 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm build"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "keywords": [
     "sri-lanka",
     "nic",
@@ -46,7 +50,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vinodliyanage/sri-lanka-nic.git"
+    "url": "git+https://github.com/vinodliyanage/sri-lanka-nic.git",
+    "directory": "packages/lib"
   },
   "bugs": {
     "url": "https://github.com/vinodliyanage/sri-lanka-nic/issues"
