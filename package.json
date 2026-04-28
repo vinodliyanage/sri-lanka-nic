@@ -13,7 +13,8 @@
     "format:check": "prettier --check .",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "pnpm --filter \"./packages/*\" build && changeset publish"
+    "release": "pnpm --filter \"./packages/*\" build && changeset publish",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "Vinod Liyanage",
@@ -21,6 +22,7 @@
   "packageManager": "pnpm@10.30.3",
   "devDependencies": {
     "@changesets/cli": "^2.31.0",
+    "husky": "^9.1.7",
     "prettier": "^3.0.0"
   }
 }
