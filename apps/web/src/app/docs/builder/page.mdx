@@ -46,7 +46,7 @@ Both builders share these methods:
 | --------------------------------------- | ------------------------------------ |
 | `.birthday({ year, month, day })`       | Set the date of birth                |
 | `.gender(Gender.MALE \| Gender.FEMALE)` | Set the gender                       |
-| `.serial(string)`                       | Set the serial number                |
+| `.serial(string)`                       | Set the serial number (4 digits for New, 3 for Old)  |
 | `.checkdigit(string)`                   | Set the check digit                  |
 | `.age(number)`                          | Set age (picks a random valid birthday for that year) |
 | `.build()`                              | Generate and validate the NIC string |
@@ -55,7 +55,7 @@ The old NIC builder has extra methods:
 
 | Method                | Description                            |
 | --------------------- | -------------------------------------- |
-| `.letter("V" \| "X")` | Set the trailing letter                |
+| `.letter("V" \| "X")` | Set the trailing letter (case-insensitive) |
 | `.voter(boolean)`     | Shortcut — `true` for V, `false` for X |
 
 ## Random Defaults

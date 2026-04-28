@@ -70,7 +70,7 @@ interface RawNICParts {
 ```typescript
 interface Birthday {
   year: number;
-  month: number;
+  month: number; // 1-indexed (1 = January, 12 = December)
   day: number;
 }
 ```
@@ -101,8 +101,8 @@ interface NICAPI {
   sanitize(nic: string): string;
   getType(nic: string): NICType;
   builder: {
-    new: (config?: NICConfig) => NICBuilder;
-    old: (config?: NICConfig) => OldNICBuilderContract;
+    new: (config?: NICConfig) => NewNICBuilder;
+    old: (config?: NICConfig) => OldNICBuilder;
   };
   random(): string;
 }
