@@ -6,7 +6,6 @@
 [![npm downloads](https://img.shields.io/npm/dm/@sri-lanka/nic?style=flat-square&color=cb3837)](https://www.npmjs.com/package/@sri-lanka/nic)
 [![bundle size](https://img.badgesize.io/https://unpkg.com/@sri-lanka/nic/dist/index.js?compression=gzip&style=flat-square&label=size&color=cb3837)](https://unpkg.com/@sri-lanka/nic/dist/index.js)
 [![license](https://img.shields.io/github/license/vinodliyanage/sri-lanka-nic?style=flat-square)](https://github.com/vinodliyanage/sri-lanka-nic/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/vinodliyanage/sri-lanka-nic?style=flat-square)](https://github.com/vinodliyanage/sri-lanka-nic)
 
 **Parse, validate, and build Sri Lankan National Identity Card numbers.**
 
@@ -15,6 +14,10 @@ Zero dependencies · TypeScript · Works everywhere
 </div>
 
 ---
+
+## Documentation
+
+Full documentation is available at the [docs site](https://nic.vinodliyanage.me).
 
 ## Install
 
@@ -95,10 +98,6 @@ NIC.parse("901404567V", {
   },
 });
 ```
-
-## Documentation
-
-Full documentation is available at the [docs site](https://github.com/vinodliyanage/sri-lanka-nic).
 
 ## Contributing
 
