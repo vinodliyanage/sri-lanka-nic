@@ -1,60 +1,47 @@
-import { daylk, Gender, MINIMUM_LEGAL_AGE_TO_HAVE_NIC, Birthday } from "../common";
+import { daylk, Gender, MINIMUM_LEGAL_AGE_TO_HAVE_NIC, NICError } from "../common";
 import { NewNIC } from "../core/new-nic";
 import { NICValidator } from "../core/nic.validator";
 import { NICConfig } from "../core/nic.types";
-import { NICBuilder, NICState } from "./builder.types";
+import { NICState } from "./builder.types";
 import { between, rand } from "./builder.utils";
+import { BaseNICBuilder } from "./base-nic.builder";
 
-export class NewNICBuilder implements NICBuilder {
-  private state: NICState = NewNICBuilder.random();
+export class NewNICBuilder extends BaseNICBuilder<NICState> {
+  protected state: NICState;
 
-  constructor(private config: NICConfig = {}) {}
+  constructor(config: NICConfig = {}) {
+    super(config);
+    this.state = this.random();
+  }
 
-  private static random(): NICState {
+  /**
+   * Sets the 4-digit serial number.
+   * @param serial - A 4-digit string (e.g., "0001", "9999").
+   * @example builder.serial("1234")
+   */
+   serial(serial: string) {
+    const SERIAL_REGXP = /^\d{4}$/;
+
+    if (!SERIAL_REGXP.test(serial)) {
+      throw new NICError("Invalid serial number");
+    }
+
+    this.state.serial = serial;
+    return this;
+  }
+
+  protected random(): NICState {
     const year = between(1900, daylk.now.year - MINIMUM_LEGAL_AGE_TO_HAVE_NIC - 1);
 
     const days = between(1, daylk.totalDaysInYear(year));
 
-    const serial = between(0, 999).toString().padStart(3, "0");
+    const serial = between(0, 9999).toString().padStart(4, "0");
 
     const checkdigit = between(0, 9).toString();
 
     const gender = rand() < 0.5 ? Gender.MALE : Gender.FEMALE;
 
     return { year, days, serial, checkdigit, gender };
-  }
-
-  serial(serial: string) {
-    this.state.serial = serial;
-    return this;
-  }
-
-  checkdigit(checkdigit: string) {
-    this.state.checkdigit = checkdigit.toString();
-    return this;
-  }
-
-  gender(gender: Gender) {
-    this.state.gender = gender;
-    return this;
-  }
-
-  birthday(birthday: Birthday) {
-    const { year, month, day } = birthday;
-
-    const days = daylk.dayOfYear(year, month, day);
-
-    this.state.year = year;
-    this.state.days = days;
-
-    return this;
-  }
-
-  age(age: number) {
-    const year = daylk.now.year - age;
-    this.state.days = between(1, daylk.totalDaysInYear(year));
-    this.state.year = year;
-    return this;
   }
 
   build() {
@@ -66,7 +53,7 @@ export class NewNICBuilder implements NICBuilder {
     const daysStr = days.toString().padStart(3, "0");
     const yearStr = year.toString();
 
-    const nic = `${yearStr}${daysStr}0${serial}${checkdigit}`;
+    const nic = `${yearStr}${daysStr}${serial}${checkdigit}`;
 
     NICValidator.validate(new NewNIC(nic), this.config);
 

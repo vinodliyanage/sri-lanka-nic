@@ -1,16 +1,60 @@
-import { daylk, Gender, Birthday } from "../common";
+import { daylk, Gender, NICError } from "../common";
 import { NICValidator } from "../core/nic.validator";
 import { OldNIC } from "../core/old-nic";
 import { NICConfig, NICLetter } from "../core/nic.types";
-import { OldNICBuilderContract, OldNICState } from "./builder.types";
+import { OldNICState } from "./builder.types";
 import { between, rand } from "./builder.utils";
+import { BaseNICBuilder } from "./base-nic.builder";
 
-export class OldNICBuilder implements OldNICBuilderContract {
-  private state: OldNICState = OldNICBuilder.random();
+export class OldNICBuilder extends BaseNICBuilder<OldNICState> {
+  protected state: OldNICState;
 
-  constructor(private config: NICConfig = {}) {}
+  constructor(config: NICConfig = {}) {
+    super(config);
+    this.state = this.random();
+  }
 
-  private static random(): OldNICState {
+  /**
+   * Sets the 3-digit serial number.
+   * @param serial - A 3-digit string (e.g., "001", "999").
+   * @example builder.serial("123")
+   */
+  serial(serial: string) {
+    const SERIAL_REGXP = /^\d{3}$/;
+
+    if (!SERIAL_REGXP.test(serial)) {
+      throw new NICError("Invalid serial number");
+    }
+
+    this.state.serial = serial;
+    return this;
+  }
+
+  /**
+   * Sets the trailing letter of the old NIC. Case-insensitive.
+   * @param letter - A {@link NICLetter} (`"V"`, `"X"`, `"v"`, or `"x"`).
+   * @example builder.letter("V")
+   */
+  letter(letter: NICLetter) {
+    const LETTER_REGXP = /^[vVxX]$/;
+
+    if (!LETTER_REGXP.test(letter)) {
+      throw new NICError("Invalid letter");
+    }
+    
+    this.state.letter = letter.toUpperCase() as NICLetter;
+    return this;
+  }
+
+  /**
+   * Pass `true` for 'V' (voter), `false` for 'X' (non-voter).
+   * */
+  voter(voter: boolean) {
+    this.state.letter = voter ? "V" : "X";
+    return this;
+  }
+
+  protected random(): OldNICState {
     const year = between(1900, 1999);
 
     const days = between(1, daylk.totalDaysInYear(year));
@@ -24,49 +68,6 @@ export class OldNICBuilder implements OldNICBuilderContract {
     const letter = rand() < 0.5 ? "V" : "X";
 
     return { year, days, serial, checkdigit, gender, letter };
-  }
-
-  serial(serial: string) {
-    this.state.serial = serial;
-    return this;
-  }
-
-  checkdigit(checkdigit: string) {
-    this.state.checkdigit = checkdigit;
-    return this;
-  }
-
-  gender(gender: Gender) {
-    this.state.gender = gender;
-    return this;
-  }
-
-  birthday(birthday: Birthday) {
-    const { year, month, day } = birthday;
-
-    const days = daylk.dayOfYear(year, month, day);
-
-    this.state.year = year;
-    this.state.days = days;
-
-    return this;
-  }
-
-  age(age: number) {
-    const year = daylk.now.year - age;
-    this.state.days = between(1, daylk.totalDaysInYear(year));
-    this.state.year = year;
-    return this;
-  }
-
-  letter(letter: NICLetter) {
-    this.state.letter = letter.toUpperCase() as NICLetter;
-    return this;
-  }
-
-  voter(voter: boolean) {
-    this.state.letter = voter ? "V" : "X";
-    return this;
   }
 
   build() {

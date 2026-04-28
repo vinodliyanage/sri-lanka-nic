@@ -14,9 +14,7 @@ export type {
 
 export { NewNICBuilder, OldNICBuilder } from "./builder";
 export type {
-  NICBuilder,
   NICState,
-  OldNICBuilderContract,
   OldNICState,
 } from "./builder/builder.types";
 

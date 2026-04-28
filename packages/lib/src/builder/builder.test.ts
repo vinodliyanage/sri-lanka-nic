@@ -25,7 +25,7 @@ describe("NewNICBuilder", () => {
   describe("chainable setters", () => {
     it("should return `this` from every setter for fluent chaining", () => {
       const builder = new NewNICBuilder();
-      const a = builder.serial("001");
+      const a = builder.serial("0001");
       const b = a.checkdigit("0");
       const c = b.gender(Gender.MALE);
       const d = c.birthday({ year: 2005, month: 6, day: 1 });
@@ -44,7 +44,7 @@ describe("NewNICBuilder", () => {
         .new()
         .gender(Gender.MALE)
         .birthday({ year: 2000, month: 1, day: 15 })
-        .serial("123")
+        .serial("0123")
         .checkdigit("4")
         .build();
 
@@ -61,7 +61,7 @@ describe("NewNICBuilder", () => {
         .new()
         .gender(Gender.FEMALE)
         .birthday({ year: 2000, month: 1, day: 15 })
-        .serial("123")
+        .serial("0123")
         .checkdigit("4")
         .build();
 
@@ -78,7 +78,7 @@ describe("NewNICBuilder", () => {
         .new()
         .gender(Gender.MALE)
         .birthday({ year: 2000, month: 2, day: 29 }) // 2000 is a leap year
-        .serial("001")
+        .serial("0001")
         .checkdigit("0")
         .build();
 
@@ -94,7 +94,7 @@ describe("NewNICBuilder", () => {
         .new()
         .gender(Gender.MALE)
         .birthday({ year: 2001, month: 12, day: 31 }) // non-leap → day 365
-        .serial("000")
+        .serial("0000")
         .checkdigit("0")
         .build();
 
@@ -123,7 +123,7 @@ describe("NewNICBuilder", () => {
           .new({ minimumAge: 99 })
           .birthday({ year: 2000, month: 1, day: 1 })
           .gender(Gender.MALE)
-          .serial("000")
+          .serial("0000")
           .checkdigit("0")
           .build(),
       ).toThrow(NICError);
@@ -358,7 +358,7 @@ describe("NIC.validate()", () => {
       .new()
       .gender(Gender.MALE)
       .birthday({ year: daylk.now.year - 20, month: 1, day: 1 })
-      .serial("000")
+      .serial("0000")
       .checkdigit("0")
       .build();
 
@@ -371,7 +371,7 @@ describe("NIC.validate()", () => {
       .new()
       .gender(Gender.MALE)
       .birthday({ year: 2005, month: 6, day: 1 })
-      .serial("000")
+      .serial("0000")
       .checkdigit("0")
       .build();
 
@@ -482,7 +482,7 @@ describe("convert()", () => {
         .new()
         .gender(Gender.MALE)
         .birthday({ year: 1990, month: 5, day: 20 })
-        .serial("234") // builder prepends nothing — the NIC template adds the leading 0
+        .serial("0234") // builder prepends nothing — the NIC template adds the leading 0
         .checkdigit("0")
         .build();
 
@@ -525,7 +525,7 @@ describe("Round-trip integrity", () => {
       .new()
       .gender(Gender.MALE)
       .birthday({ year: 1998, month: 11, day: 3 })
-      .serial("050")
+      .serial("0050")
       .checkdigit("2")
       .build();
 

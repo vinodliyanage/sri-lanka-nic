@@ -19,6 +19,7 @@ export enum Gender {
  */
 export interface Birthday {
   year: number;
+  /** 1-indexed (1 = January, 12 = December). */
   month: number;
   day: number;
 }

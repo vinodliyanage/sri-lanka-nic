@@ -1,5 +1,6 @@
 import { Gender, NICType, NICError } from "../common";
-import { NICBuilder, OldNICBuilderContract } from "../builder/builder.types";
+import { NewNICBuilder } from "../builder/new-nic.builder";
+import { OldNICBuilder } from "../builder/old-nic.builder";
 
 /**
  * The main object for parsing, validating, and generating Sri Lankan NICs.
@@ -35,8 +36,8 @@ export interface NICAPI {
    * Creates builders that let you step-by-step generate a NIC string.
    */
   get builder(): {
-    new: (config?: NICConfig) => NICBuilder;
-    old: (config?: NICConfig) => OldNICBuilderContract;
+    new: (config?: NICConfig) => NewNICBuilder;
+    old: (config?: NICConfig) => OldNICBuilder;
   };
 
   /**
