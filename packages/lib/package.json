@@ -1,6 +1,6 @@
 {
   "name": "@sri-lanka/nic",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Parse, validate, and build Sri Lankan National Identity Card (NIC) numbers",
   "type": "module",
   "sideEffects": false,

@@ -1,5 +1,11 @@
 # @sri-lanka/nic
 
+## 1.2.1
+
+### Patch Changes
+
+- 576eb8b: Optimize build size by enabling minification and removing sourcemaps.
+
 ## 1.2.0
 
 ### Minor Changes
