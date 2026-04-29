@@ -1,0 +1,15 @@
+pre-commit:
+  parallel: true
+  commands:
+    format:
+      glob: "*.{ts,tsx,js,jsx,json,md,yml,yaml,css}"
+      run: pnpm prettier --write {staged_files}
+      stage_fixed: true
+    lint:
+      run: pnpm lint
+
+pre-push:
+  commands:
+    test-lib:
+      glob: "packages/lib/**/*"
+      run: pnpm --filter ./packages/lib test
