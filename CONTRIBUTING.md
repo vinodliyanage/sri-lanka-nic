@@ -86,9 +86,6 @@ We use [Prettier](https://prettier.io/) for formatting. It runs automatically, b
 ```bash
 # Format all files
 pnpm format
-
-# Check formatting without writing
-pnpm format:check
 ```
 
 Please don't include formatting-only changes in feature PRs. If you spot formatting issues, submit a separate PR.

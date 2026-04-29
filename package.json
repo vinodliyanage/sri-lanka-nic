@@ -10,7 +10,6 @@
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm --filter \"./packages/*\" build && changeset publish",
