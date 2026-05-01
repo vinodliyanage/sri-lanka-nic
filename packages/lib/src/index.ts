@@ -3,10 +3,11 @@ export { NICValidator, NICTemplate, NewNIC, OldNIC } from "./core";
 export type {
   NICAPI,
   NICConfig,
+  ResolvedNICConfig,
   NICInstance,
   PublicNIC,
   InternalNIC,
-  ResolvedNICConfig,
+  NICOptions,
   RawNICParts,
   FormattedNICParts,
   NICLetter,

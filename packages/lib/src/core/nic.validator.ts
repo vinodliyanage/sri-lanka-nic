@@ -1,5 +1,5 @@
 import { daylk, errors, NICError, NICType } from "../common";
-import { InternalNIC, NICConfig } from "./nic.types";
+import { InternalNIC, NICConfig, NICOptions, NICValidatorConfig } from "./nic.types";
 
 export const NICValidator = {
   sanitize(nic: string) {
@@ -18,26 +18,19 @@ export const NICValidator = {
     throw new NICError(errors.INVALID_NIC_STRUCTURE);
   },
 
-  validate(nic: InternalNIC, options: NICConfig = {}) {
-    const defaults = nic.config;
-
-    const resolved = {
-      minimumAge: options.minimumAge ?? defaults.minimumAge,
-      maximumAge: options.maximumAge ?? defaults.maximumAge,
-      minimumBirthYear: options.minimumBirthYear ?? defaults.minimumBirthYear,
-      maximumBirthYear: options.maximumBirthYear ?? defaults.maximumBirthYear,
-      check: options.check,
-    };
+  validate(nic: InternalNIC, options?: NICValidatorConfig) {
+    const config = nic.config;
+    const check = options?.check;
 
     const { year, days } = nic.formatted;
 
     const totalDaysInBirthYear = daylk.totalDaysInYear(year);
 
-    if (year < resolved.minimumBirthYear) {
+    if (year < config.minimumBirthYear) {
       throw new NICError(errors.MAXIMUM_AGE_REQUIREMENT_NOT_MET);
     }
 
-    if (year > resolved.maximumBirthYear) {
+    if (year > config.maximumBirthYear) {
       throw new NICError(errors.MINIMUM_AGE_REQUIREMENT_NOT_MET);
     }
 
@@ -45,14 +38,14 @@ export const NICValidator = {
       throw new NICError(errors.INVALID_DAY_OF_YEAR);
     }
 
-    if (nic.age < resolved.minimumAge) {
+    if (nic.age < config.minimumAge) {
       throw new NICError(errors.MINIMUM_AGE_REQUIREMENT_NOT_MET);
     }
 
-    if (nic.age > resolved.maximumAge) {
+    if (nic.age > config.maximumAge) {
       throw new NICError(errors.MAXIMUM_AGE_REQUIREMENT_NOT_MET);
     }
 
-    resolved.check?.(nic, NICError);
+    check?.(nic, NICError);
   },
 };

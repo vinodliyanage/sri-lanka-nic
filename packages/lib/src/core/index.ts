@@ -1,15 +1,16 @@
 export { NIC } from "./nic";
 export { NICValidator } from "./nic.validator";
-export { NICTemplate } from "./nic-template";
+export { BaseNIC as NICTemplate } from "./base-nic";
 export { NewNIC } from "./new-nic";
 export { OldNIC } from "./old-nic";
 export type {
   NICAPI,
   NICConfig,
+  ResolvedNICConfig,
   NICInstance,
   PublicNIC,
   InternalNIC,
-  ResolvedNICConfig,
+  NICOptions,
   RawNICParts,
   FormattedNICParts,
   NICLetter,

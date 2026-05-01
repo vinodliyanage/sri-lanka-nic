@@ -77,6 +77,33 @@ parts.checkdigit; // "7"
 parts.letter; // "V"
 ```
 
+## Resolved Config
+
+After parsing, you can inspect the validation boundaries that were applied:
+
+```typescript
+const nic = NIC.parse("200001501234");
+
+console.log(nic.config);
+// {
+//   minimumAge: 15,
+//   maximumAge: 126,
+//   minimumBirthYear: 1900,
+//   maximumBirthYear: 2011,
+// }
+```
+
+When you pass custom overrides, the resolved config reflects the merge:
+
+```typescript
+const nic = NIC.parse("200001501234", { minimumAge: 18 });
+
+console.log(nic.config.minimumAge); // 18 (your override)
+console.log(nic.config.maximumAge); // 126 (default)
+```
+
+This is useful for debugging why a NIC passed or failed validation, or for logging the exact rules that were applied.
+
 ## Format Conversion
 
 Convert between old and new formats:

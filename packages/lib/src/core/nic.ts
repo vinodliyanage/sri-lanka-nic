@@ -2,30 +2,30 @@ import { NICError, NICType } from "../common";
 import { NewNIC } from "./new-nic";
 import { OldNIC } from "./old-nic";
 import { NICValidator } from "./nic.validator";
-import { NICConfig, InternalNIC, PublicNIC as NICInstance, NICAPI } from "./nic.types";
+import { NICConfig, InternalNIC, PublicNIC as NICInstance, NICAPI, NICOptions } from "./nic.types";
 import { NewNICBuilder, OldNICBuilder } from "../builder";
 
 export const NIC: NICAPI = {
-  parse(nic: string, options?: NICConfig) {
+  parse(nic: string, options?: NICOptions) {
     nic = NICValidator.sanitize(nic);
 
     const type = NICValidator.getType(nic);
 
     let instance: InternalNIC;
 
-    if (type === NICType.NEW) instance = new NewNIC(nic);
-    else instance = new OldNIC(nic);
+    if (type === NICType.NEW) instance = new NewNIC(nic, options);
+    else instance = new OldNIC(nic, options);
 
     NICValidator.validate(instance, options);
 
     return instance as NICInstance;
   },
 
-  validate(nic: string, options?: NICConfig) {
+  validate(nic: string, options?: NICOptions) {
     this.parse(nic, options);
   },
 
-  valid(nic: string, options?: NICConfig) {
+  valid(nic: string, options?: NICOptions) {
     try {
       this.parse(nic, options);
       return true;
@@ -45,8 +45,8 @@ export const NIC: NICAPI = {
 
   get builder() {
     return {
-      new: (config?: NICConfig) => new NewNICBuilder(config),
-      old: (config?: NICConfig) => new OldNICBuilder(config),
+      new: (options?: NICOptions) => new NewNICBuilder(options),
+      old: (options?: NICOptions) => new OldNICBuilder(options),
     };
   },
 

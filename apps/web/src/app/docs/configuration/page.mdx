@@ -1,22 +1,32 @@
 export const metadata = {
   title: "Configuration",
-  description: "Customize validation rules with NICConfig options.",
+  description: "Customize validation constraints and add custom rules with NICOptions.",
 };
 
 # Configuration
 
-You can pass a config object to `NIC.parse()`, `NIC.validate()`, or `NIC.valid()` to customize validation behavior.
+You can pass an options object to `NIC.parse()`, `NIC.validate()`, or `NIC.valid()` to override default validation constraints and add custom rules.
 
 ## Options
 
+The options parameter accepts `NICOptions`, which combines two interfaces:
+
 ```typescript
+// Validation boundary overrides
 interface NICConfig {
   minimumAge?: number;
   maximumAge?: number;
   minimumBirthYear?: number;
   maximumBirthYear?: number;
+}
+
+// Custom validation hooks
+interface NICValidatorConfig {
   check?: (nic: NICInstance, NICError: typeof NICError) => void;
 }
+
+// Combined type used by parse(), validate(), and valid()
+type NICOptions = NICConfig & NICValidatorConfig;
 ```
 
 ## Age Constraints
@@ -84,3 +94,29 @@ The `check` function receives:
 2. **`NICError`** — The error class to throw (so you get consistent error types)
 
 > **Note**: The `check` function only runs if all built-in validations pass first. If the NIC structure is invalid, your function won't be called.
+
+## Default Config
+
+Each NIC class exposes a static `defaultConfig` getter that returns the built-in validation boundaries for that format. This is useful for inspecting or logging the defaults without creating an instance:
+
+```typescript
+import { NewNIC, OldNIC } from "@sri-lanka/nic";
+
+console.log(NewNIC.defaultConfig);
+// {
+//   minimumAge: 15,
+//   maximumAge: 126,        (current year - 1900)
+//   minimumBirthYear: 1900,
+//   maximumBirthYear: 2011, (current year - 15)
+// }
+
+console.log(OldNIC.defaultConfig);
+// {
+//   minimumAge: 15,
+//   maximumAge: 126,        (current year - 1900)
+//   minimumBirthYear: 1900,
+//   maximumBirthYear: 1999, (fixed, old format is always 19XX)
+// }
+```
+
+> **Note**: `maximumAge` and `maximumBirthYear` (for new NICs) are computed from the current date, so they change each year.

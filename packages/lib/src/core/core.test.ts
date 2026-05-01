@@ -428,33 +428,25 @@ describe("NICValidator", () => {
       });
 
       it("should allow overriding minimumAge via config", () => {
-        const nic = new NewNIC("200001501234"); // person born in 2000, age ~25
-        expect(() => NICValidator.validate(nic, { minimumAge: 50 })).toThrow(
-          errors.MINIMUM_AGE_REQUIREMENT_NOT_MET,
-        );
+        const nic = new NewNIC("200001501234", { minimumAge: 50 }); // person born in 2000, age ~25
+        expect(() => NICValidator.validate(nic)).toThrow(errors.MINIMUM_AGE_REQUIREMENT_NOT_MET);
       });
 
       it("should allow overriding maximumAge via config", () => {
-        const nic = new OldNIC("500011234V"); // person born in 1950, age ~75
-        expect(() => NICValidator.validate(nic, { maximumAge: 30 })).toThrow(
-          errors.MAXIMUM_AGE_REQUIREMENT_NOT_MET,
-        );
+        const nic = new OldNIC("500011234V", { maximumAge: 30 }); // person born in 1950, age ~75
+        expect(() => NICValidator.validate(nic)).toThrow(errors.MAXIMUM_AGE_REQUIREMENT_NOT_MET);
       });
     });
 
     describe("birth year constraints", () => {
       it("should allow overriding minimumBirthYear via config", () => {
-        const nic = new OldNIC("500011234V"); // born 1950
-        expect(() => NICValidator.validate(nic, { minimumBirthYear: 1980 })).toThrow(
-          errors.MAXIMUM_AGE_REQUIREMENT_NOT_MET,
-        );
+        const nic = new OldNIC("500011234V", { minimumBirthYear: 1980 }); // born 1950
+        expect(() => NICValidator.validate(nic)).toThrow(errors.MAXIMUM_AGE_REQUIREMENT_NOT_MET);
       });
 
       it("should allow overriding maximumBirthYear via config", () => {
-        const nic = new NewNIC("200001501234"); // born 2000
-        expect(() => NICValidator.validate(nic, { maximumBirthYear: 1990 })).toThrow(
-          errors.MINIMUM_AGE_REQUIREMENT_NOT_MET,
-        );
+        const nic = new NewNIC("200001501234", { maximumBirthYear: 1990 }); // born 2000
+        expect(() => NICValidator.validate(nic)).toThrow(errors.MINIMUM_AGE_REQUIREMENT_NOT_MET);
       });
     });
 
