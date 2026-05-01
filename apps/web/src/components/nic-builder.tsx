@@ -3,41 +3,63 @@
 import { useState, useCallback } from "react";
 import { NIC, Gender, NICError } from "@sri-lanka/nic";
 import { Copy, Check, Shuffle, Wrench } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 type NICFormat = "new" | "old";
 
+interface NICFormData {
+  format: NICFormat;
+  gender: "MALE" | "FEMALE";
+  year: string;
+  month: string;
+  day: string;
+  letter: "V" | "X";
+}
+
 export function NICBuilder() {
-  const [format, setFormat] = useState<NICFormat>("new");
-  const [gender, setGender] = useState<"MALE" | "FEMALE">("MALE");
-  const [year, setYear] = useState("1995");
-  const [month, setMonth] = useState("6");
-  const [day, setDay] = useState("15");
-  const [letter, setLetter] = useState<"V" | "X">("V");
+  const { register, handleSubmit, watch, setValue } = useForm<NICFormData>({
+    defaultValues: {
+      format: "new",
+      gender: "MALE",
+      year: "1995",
+      month: "6",
+      day: "15",
+      letter: "V",
+    },
+  });
+
+  const format = watch("format");
+
   const [output, setOutput] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const build = useCallback(() => {
+  const build = useCallback((data: NICFormData) => {
     setCopied(false);
     try {
-      const builder = format === "new" ? NIC.builder.new() : NIC.builder.old();
+      const builder = data.format === "new" ? NIC.builder.new() : NIC.builder.old();
 
-      builder
-        .birthday({ year: parseInt(year), month: parseInt(month), day: parseInt(day) })
-        .gender(gender === "MALE" ? Gender.MALE : Gender.FEMALE);
+      const birthday = {
+        year: parseInt(data.year),
+        month: parseInt(data.month),
+        day: parseInt(data.day),
+      };
 
-      if (format === "old" && "letter" in builder) {
-        (builder as ReturnType<typeof NIC.builder.old>).letter(letter);
-      }
+      const gender = data.gender === "MALE" ? Gender.MALE : Gender.FEMALE;
+
+      builder.birthday(birthday).gender(gender);
+
+      if ("letter" in builder) builder.letter(data.letter);
 
       const result = builder.build();
+
       setOutput(result);
       setError(null);
     } catch (e) {
       setOutput(null);
       setError(e instanceof NICError ? e.message : "Failed to build NIC");
     }
-  }, [format, gender, year, month, day, letter]);
+  }, []);
 
   const random = useCallback(() => {
     setCopied(false);
@@ -58,7 +80,7 @@ export function NICBuilder() {
   }, [output]);
 
   return (
-    <div className="w-full">
+    <form onSubmit={handleSubmit(build)} className="w-full">
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Format toggle */}
         <div className="sm:col-span-2">
@@ -67,7 +89,8 @@ export function NICBuilder() {
           </label>
           <div className="mt-1.5 flex gap-2">
             <button
-              onClick={() => setFormat("new")}
+              type="button"
+              onClick={() => setValue("format", "new")}
               className={`flex-1 rounded-lg border px-3 py-2 text-sm transition-all ${
                 format === "new"
                   ? "border-accent bg-accent-light font-medium text-accent"
@@ -77,7 +100,8 @@ export function NICBuilder() {
               New (12-digit)
             </button>
             <button
-              onClick={() => setFormat("old")}
+              type="button"
+              onClick={() => setValue("format", "old")}
               className={`flex-1 rounded-lg border px-3 py-2 text-sm transition-all ${
                 format === "old"
                   ? "border-accent bg-accent-light font-medium text-accent"
@@ -95,8 +119,7 @@ export function NICBuilder() {
             Gender
           </label>
           <select
-            value={gender}
-            onChange={(e) => setGender(e.target.value as "MALE" | "FEMALE")}
+            {...register("gender")}
             className="mt-1.5 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
           >
             <option value="MALE">Male</option>
@@ -111,8 +134,7 @@ export function NICBuilder() {
               Letter
             </label>
             <select
-              value={letter}
-              onChange={(e) => setLetter(e.target.value as "V" | "X")}
+              {...register("letter")}
               className="mt-1.5 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
             >
               <option value="V">V (Voter)</option>
@@ -128,8 +150,7 @@ export function NICBuilder() {
           </label>
           <input
             type="number"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
+            {...register("year")}
             min={1900}
             max={2010}
             className="mt-1.5 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
@@ -143,8 +164,7 @@ export function NICBuilder() {
             </label>
             <input
               type="number"
-              value={month}
-              onChange={(e) => setMonth(e.target.value)}
+              {...register("month")}
               min={1}
               max={12}
               className="mt-1.5 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
@@ -156,8 +176,7 @@ export function NICBuilder() {
             </label>
             <input
               type="number"
-              value={day}
-              onChange={(e) => setDay(e.target.value)}
+              {...register("day")}
               min={1}
               max={31}
               className="mt-1.5 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
@@ -169,13 +188,14 @@ export function NICBuilder() {
       {/* Actions */}
       <div className="mt-5 flex gap-2">
         <button
-          onClick={build}
+          type="submit"
           className="flex items-center gap-2 rounded-lg bg-text px-4 py-2.5 text-sm font-medium text-bg transition-opacity hover:opacity-90"
         >
           <Wrench size={14} />
           Build
         </button>
         <button
+          type="button"
           onClick={random}
           className="flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium transition-colors hover:bg-bg-secondary"
         >
@@ -190,6 +210,7 @@ export function NICBuilder() {
         <div className="mt-4 flex items-center gap-2 rounded-lg border border-border bg-bg-secondary px-4 py-3 animate-in fade-in">
           <p className="flex-1 font-mono text-lg tracking-wider font-medium">{output}</p>
           <button
+            type="button"
             onClick={copy}
             className="shrink-0 rounded-md p-1.5 text-text-muted transition-colors hover:bg-surface hover:text-text"
           >
@@ -197,6 +218,6 @@ export function NICBuilder() {
           </button>
         </div>
       )}
-    </div>
+    </form>
   );
 }
