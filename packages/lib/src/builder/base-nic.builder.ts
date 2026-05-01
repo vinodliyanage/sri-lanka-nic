@@ -1,5 +1,5 @@
 import { daylk, Gender, Birthday, NICError } from "../common";
-import { NICConfig } from "../core/nic.types";
+import { NICConfig, NICOptions } from "../core/nic.types";
 import { NICState } from "./builder.types";
 import { between } from "./builder.utils";
 
@@ -14,7 +14,7 @@ export abstract class BaseNICBuilder<TState extends NICState> {
    */
   public abstract build(): string;
 
-  constructor(protected config: NICConfig = {}) {}
+  constructor(protected options: NICOptions = {}) {}
 
   /**
    * Sets the check digit.

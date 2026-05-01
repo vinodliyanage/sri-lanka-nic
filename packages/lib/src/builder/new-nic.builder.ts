@@ -55,7 +55,7 @@ export class NewNICBuilder extends BaseNICBuilder<NICState> {
 
     const nic = `${yearStr}${daysStr}${serial}${checkdigit}`;
 
-    NICValidator.validate(new NewNIC(nic), this.config);
+    NICValidator.validate(new NewNIC(nic, this.options), this.options);
 
     return nic;
   }

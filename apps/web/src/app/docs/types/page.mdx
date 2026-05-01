@@ -8,7 +8,7 @@ export const metadata = {
 All types are exported from the package and can be imported directly:
 
 ```typescript
-import type { PublicNIC, NICConfig, NICType, Gender, Birthday } from "@sri-lanka/nic";
+import type { PublicNIC, NICConfig, ResolvedNICConfig, NICOptions, NICType, Gender, Birthday } from "@sri-lanka/nic";
 ```
 
 ## Enums
@@ -47,6 +47,7 @@ interface PublicNIC {
   birthday: { year: number; month: number; day: number };
   age: number; // Current age
   parts: RawNICParts; // Raw string slices
+  config: ResolvedNICConfig; // Resolved validation boundaries
   convert(options?: { letter?: "V" | "X" }): string;
 }
 ```
@@ -77,7 +78,7 @@ interface Birthday {
 
 ### `NICConfig`
 
-Options for parsing and validation:
+Optional overrides for the default validation boundaries:
 
 ```typescript
 interface NICConfig {
@@ -85,7 +86,37 @@ interface NICConfig {
   maximumAge?: number;
   minimumBirthYear?: number;
   maximumBirthYear?: number;
+}
+```
+
+### `NICValidatorConfig`
+
+Hooks for extending validation with custom logic:
+
+```typescript
+interface NICValidatorConfig {
   check?: (nic: PublicNIC, NICError: typeof NICError) => void;
+}
+```
+
+### `NICOptions`
+
+Combined type used by `parse()`, `validate()`, and `valid()`:
+
+```typescript
+type NICOptions = NICConfig & NICValidatorConfig;
+```
+
+### `ResolvedNICConfig`
+
+The fully resolved validation boundaries (all fields required and readonly):
+
+```typescript
+interface ResolvedNICConfig {
+  readonly minimumAge: number;
+  readonly maximumAge: number;
+  readonly minimumBirthYear: number;
+  readonly maximumBirthYear: number;
 }
 ```
 
@@ -95,14 +126,14 @@ The shape of the main `NIC` object:
 
 ```typescript
 interface NICAPI {
-  parse(nic: string, options?: NICConfig): PublicNIC;
-  validate(nic: string, options?: NICConfig): void;
-  valid(nic: string, options?: NICConfig): boolean;
+  parse(nic: string, options?: NICOptions): PublicNIC;
+  validate(nic: string, options?: NICOptions): void;
+  valid(nic: string, options?: NICOptions): boolean;
   sanitize(nic: string): string;
   getType(nic: string): NICType;
   builder: {
-    new: (config?: NICConfig) => NewNICBuilder;
-    old: (config?: NICConfig) => OldNICBuilder;
+    new: (options?: NICOptions) => NewNICBuilder;
+    old: (options?: NICOptions) => OldNICBuilder;
   };
   random(): string;
 }

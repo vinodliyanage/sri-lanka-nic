@@ -8,19 +8,19 @@ import { OldNICBuilder } from "../builder/old-nic.builder";
 export interface NICAPI {
   /**
    * Takes a NIC string and gives back an object with the parsed details like age, birthday and gender.
-   * @throws {NICError} If the NIC string is invalid or fails config checks.
+   * @throws {NICError} If the NIC string is invalid or fails validation constraints.
    */
-  parse(nic: string, options?: NICConfig): PublicNIC;
+  parse(nic: string, options?: NICOptions): PublicNIC;
 
   /**
    * Checks if a NIC is valid. Throws an error if it's not.
    */
-  validate(nic: string, options?: NICConfig): void;
+  validate(nic: string, options?: NICOptions): void;
 
   /**
    * Checks if a NIC is valid. Returns true or false without throwing errors.
    */
-  valid(nic: string, options?: NICConfig): boolean;
+  valid(nic: string, options?: NICOptions): boolean;
 
   /**
    * Removes spaces and converts the NIC to uppercase.
@@ -36,8 +36,8 @@ export interface NICAPI {
    * Creates builders that let you step-by-step generate a NIC string.
    */
   get builder(): {
-    new: (config?: NICConfig) => NewNICBuilder;
-    old: (config?: NICConfig) => OldNICBuilder;
+    new: (options?: NICOptions) => NewNICBuilder;
+    old: (options?: NICOptions) => OldNICBuilder;
   };
 
   /**
@@ -127,6 +127,28 @@ export interface PublicNIC {
   parts: RawNICParts;
 
   /**
+   * The resolved validation boundaries used for this NIC, after merging
+   * any user-provided overrides with the format-specific defaults.
+   *
+   * Contains the age and birth-year limits that were applied during parsing.
+   *
+   * @example
+   * const nic = NIC.parse("200012345678");
+   * console.log(nic.config);
+   * // {
+   * //   minimumAge: 16,
+   * //   maximumAge: 126,
+   * //   minimumBirthYear: 1900,
+   * //   maximumBirthYear: 2010,
+   * // }
+   *
+   * // With custom overrides:
+   * const nic = NIC.parse("200012345678", { minimumAge: 18 });
+   * console.log(nic.config.minimumAge); // 18
+   */
+  config: ResolvedNICConfig;
+
+  /**
    * Switches the NIC to the other format (e.g., Old to New).
    */
   convert(options?: { letter?: "V" | "X" }): string;
@@ -135,36 +157,70 @@ export interface PublicNIC {
 export type NICInstance = PublicNIC;
 
 /**
- * Internal NIC object used by the library.
+ * Internal NIC representation used within the library.
+ * Extends {@link PublicNIC} with processed parts that are not exposed to consumers.
  */
 export interface InternalNIC extends PublicNIC {
-  config: ResolvedNICConfig;
   formatted: FormattedNICParts;
 }
 
 /**
- * Config options with all defaults filled in.
+ * The fully resolved validation boundaries after merging user-provided
+ * overrides with format-specific defaults. All fields are readonly
+ * to prevent mutation after resolution.
  */
 export interface ResolvedNICConfig {
-  minimumAge: number;
-  maximumAge: number;
-  minimumBirthYear: number;
-  maximumBirthYear: number;
+  /** The minimum age (in years) a person must be to hold a valid NIC. */
+  readonly minimumAge: number;
+  /** The maximum age (in years) a NIC holder can be. */
+  readonly maximumAge: number;
+  /** The earliest birth year considered valid. */
+  readonly minimumBirthYear: number;
+  /** The latest birth year considered valid. */
+  readonly maximumBirthYear: number;
 }
 
 export type NICLetter = "V" | "X" | "v" | "x";
 
 /**
- * Options to customize how a NIC is parsed or validated.
+ * Optional overrides for the default validation boundaries.
+ * Any field left unset falls back to the format-specific default.
  */
 export interface NICConfig {
+  /** Override the minimum age constraint. */
   minimumAge?: number;
+  /** Override the maximum age constraint. */
   maximumAge?: number;
+  /** Override the earliest valid birth year. */
   minimumBirthYear?: number;
+  /** Override the latest valid birth year. */
   maximumBirthYear?: number;
+}
 
+/**
+ * Hooks for extending validation with custom logic.
+ */
+export interface NICValidatorConfig {
   /**
-   * A custom function you can provide to write your own validation rules.
+   * A custom validation function that runs after the built-in checks.
+   * Throw a {@link NICError} to reject the NIC.
+   *
+   * @param nic - The parsed NIC instance.
+   * @param Error - The {@link NICError} constructor for throwing validation errors.
+   *
+   * @example
+   * NIC.parse("200012345678", {
+   *   check(nic, Error) {
+   *     if (nic.age < 18) throw new Error("Must be 18 or older");
+   *   },
+   * });
    */
   check?: (nic: NICInstance, Error: typeof NICError) => void;
 }
+
+/**
+ * Combined options for parsing and validating a NIC.
+ * Merges validation boundary overrides ({@link NICConfig}) with
+ * custom validator hooks ({@link NICValidatorConfig}).
+ */
+export type NICOptions = NICValidatorConfig & NICConfig;

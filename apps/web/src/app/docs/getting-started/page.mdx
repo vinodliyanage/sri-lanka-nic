@@ -41,15 +41,16 @@ That's it. The library auto-detects the NIC format (old or new), validates it, a
 
 The `.parse()` method returns an object with these properties:
 
-| Property   | Type          | Description                              |
-| ---------- | ------------- | ---------------------------------------- |
-| `value`    | `string`      | The sanitized NIC string                 |
-| `type`     | `NICType`     | `"NEW"` (12-digit) or `"OLD"` (9+letter) |
-| `gender`   | `Gender`      | `"MALE"` or `"FEMALE"`                   |
-| `birthday` | `Birthday`    | `{ year, month, day }`                   |
-| `age`      | `number`      | Current age (Sri Lanka time)             |
-| `parts`    | `RawNICParts` | Raw NIC string slices                    |
-| `convert`  | `function`    | Convert to the other format              |
+| Property   | Type                | Description                              |
+| ---------- | ------------------- | ---------------------------------------- |
+| `value`    | `string`            | The sanitized NIC string                 |
+| `type`     | `NICType`           | `"NEW"` (12-digit) or `"OLD"` (9+letter) |
+| `gender`   | `Gender`            | `"MALE"` or `"FEMALE"`                   |
+| `birthday` | `Birthday`          | `{ year, month, day }`                   |
+| `age`      | `number`            | Current age (Sri Lanka time)             |
+| `parts`    | `RawNICParts`       | Raw NIC string slices                    |
+| `config`   | `ResolvedNICConfig` | The resolved validation boundaries       |
+| `convert`  | `function`          | Convert to the other format              |
 
 ## Quick Validation
 
@@ -69,5 +70,5 @@ NIC.valid("invalid"); // false
 The library is written in TypeScript. All types are exported:
 
 ```typescript
-import type { PublicNIC, NICConfig, NICType, Gender } from "@sri-lanka/nic";
+import type { PublicNIC, NICConfig, ResolvedNICConfig, NICOptions, NICType, Gender } from "@sri-lanka/nic";
 ```

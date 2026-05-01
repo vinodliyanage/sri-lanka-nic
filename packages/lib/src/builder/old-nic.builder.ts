@@ -81,7 +81,7 @@ export class OldNICBuilder extends BaseNICBuilder<OldNICState> {
 
     const nic = `${yearStr}${daysStr}${serial}${checkdigit}${letter}`;
 
-    NICValidator.validate(new OldNIC(nic), this.config);
+    NICValidator.validate(new OldNIC(nic, this.options), this.options);
 
     return nic;
   }
