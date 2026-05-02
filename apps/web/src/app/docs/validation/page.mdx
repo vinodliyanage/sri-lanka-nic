@@ -49,7 +49,8 @@ When you parse or validate a NIC, the library executes checks in a very specific
 2. **Structural Validation**: Tests the string against strict Regular Expressions to ensure it is exactly 12 digits or 9 digits plus V/X.
 3. **Extraction**: Calculates the `year` and `days` from the raw string.
 4. **Logic Validations**: Verifies that the days correspond to a real day in that specific birth year, and that the computed age falls within the permitted minimum/maximum limits.
-5. **Custom Validation (`check` callback)**: Finally, if you provided a `check` function in the config, it executes your custom rules. This guarantees your custom function only runs if the NIC is structurally and mathematically sound.
+5. **Type Restrictions**: If `onlyNew` or `onlyOld` is set, rejects NICs of the wrong format.
+6. **Custom Validation (`check` callback)**: Finally, if you provided a `check` function in the config, it executes your custom rules. This guarantees your custom function only runs if the NIC is structurally and mathematically sound.
 
 ## What Gets Validated
 
@@ -60,6 +61,7 @@ The library checks these things automatically:
 3. **Minimum age** — Default: 15 (legal age to hold a NIC)
 4. **Maximum age** — Default: current year minus 1900
 5. **Birth year range** — Must fall within the valid range for the NIC format
+6. **Type restrictions** — If `onlyNew` or `onlyOld` is set, the NIC must be the specified format
 
 ## What is NOT Validated
 
