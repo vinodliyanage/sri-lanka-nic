@@ -1,17 +1,20 @@
 import { daylk, MINIMUM_LEGAL_AGE_TO_HAVE_NIC, NICType } from "../common";
+import { resolveNICConfig } from "../common/utils";
 import { BaseNIC } from "./base-nic";
 import { NICConfig, RawNICParts, ResolvedNICConfig } from "./nic.types";
 
 export class OldNIC extends BaseNIC {
   public type: NICType = NICType.OLD;
+  public value: string;
 
+  private _options: ResolvedNICConfig;
   private _parts: RawNICParts | null = null;
 
-  constructor(
-    public value: string,
-    protected options?: NICConfig,
-  ) {
+  constructor(value: string, options?: NICConfig) {
     super();
+
+    this.value = value;
+    this._options = resolveNICConfig(OldNIC.defaultConfig, options);
   }
 
   static get defaultConfig(): ResolvedNICConfig {
@@ -26,7 +29,7 @@ export class OldNIC extends BaseNIC {
   }
 
   get config(): ResolvedNICConfig {
-    return this.resolveConfig(OldNIC.defaultConfig);
+    return this._options;
   }
 
   get parts(): RawNICParts {

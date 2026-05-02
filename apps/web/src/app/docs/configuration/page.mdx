@@ -20,8 +20,10 @@ interface NICConfig {
   maximumBirthYear?: number;
 }
 
-// Custom validation hooks
+// Custom validation hooks and format restrictions
 interface NICValidatorConfig {
+  onlyNew?: boolean;
+  onlyOld?: boolean;
   check?: (nic: NICInstance, NICError: typeof NICError) => void;
 }
 
@@ -68,6 +70,29 @@ NIC.parse("901404567V", {
 | `minimumBirthYear` | `1900`                | `1900`  |
 | `maximumBirthYear` | Current year minus 15 | `1999`  |
 
+## Type Restrictions
+
+Restrict validation to only accept a specific NIC format:
+
+```typescript
+import { NIC } from "@sri-lanka/nic";
+
+// Only accept new-format (12-digit) NICs
+NIC.parse("200001501234", { onlyNew: true }); // ✅ passes
+NIC.parse("901404567V", { onlyNew: true }); // ❌ throws NICError
+
+// Only accept old-format (9-digit + letter) NICs
+NIC.parse("901404567V", { onlyOld: true }); // ✅ passes
+NIC.parse("200001501234", { onlyOld: true }); // ❌ throws NICError
+```
+
+This works with `NIC.validate()` and `NIC.valid()` too:
+
+```typescript
+NIC.valid("901404567V", { onlyNew: true }); // false
+NIC.valid("901404567V", { onlyOld: true }); // true
+```
+
 ## Custom Validation
 
 Add your own rules with the `check` function. It runs after all built-in checks pass:
@@ -97,12 +122,12 @@ The `check` function receives:
 
 ## Default Config
 
-Each NIC class exposes a static `defaultConfig` getter that returns the built-in validation boundaries for that format. This is useful for inspecting or logging the defaults without creating an instance:
+The `NIC.defaultConfig` getter returns the built-in validation boundaries for both NIC formats. This is useful for inspecting or logging the defaults:
 
 ```typescript
-import { NewNIC, OldNIC } from "@sri-lanka/nic";
+import { NIC } from "@sri-lanka/nic";
 
-console.log(NewNIC.defaultConfig);
+console.log(NIC.defaultConfig.new);
 // {
 //   minimumAge: 15,
 //   maximumAge: 126,        (current year - 1900)
@@ -110,7 +135,7 @@ console.log(NewNIC.defaultConfig);
 //   maximumBirthYear: 2011, (current year - 15)
 // }
 
-console.log(OldNIC.defaultConfig);
+console.log(NIC.defaultConfig.old);
 // {
 //   minimumAge: 15,
 //   maximumAge: 126,        (current year - 1900)

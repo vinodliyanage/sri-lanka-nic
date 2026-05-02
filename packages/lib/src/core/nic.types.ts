@@ -33,6 +33,14 @@ export interface NICAPI {
   getType(nic: string): NICType;
 
   /**
+   * Returns default validation boundaries for NEW and OLD NICs.
+   */
+  get defaultConfig(): {
+    new: ResolvedNICConfig;
+    old: ResolvedNICConfig;
+  };
+
+  /**
    * Creates builders that let you step-by-step generate a NIC string.
    */
   get builder(): {
@@ -187,20 +195,41 @@ export type NICLetter = "V" | "X" | "v" | "x";
  * Any field left unset falls back to the format-specific default.
  */
 export interface NICConfig {
-  /** Override the minimum age constraint. */
+  /**
+   * Override the minimum age constraint.
+   */
   minimumAge?: number;
-  /** Override the maximum age constraint. */
+
+  /**
+   * Override the maximum age constraint.
+   */
   maximumAge?: number;
-  /** Override the earliest valid birth year. */
+
+  /**
+   * Override the earliest valid birth year.
+   */
   minimumBirthYear?: number;
-  /** Override the latest valid birth year. */
+
+  /**
+   * Override the latest valid birth year.
+   */
   maximumBirthYear?: number;
 }
 
 /**
- * Hooks for extending validation with custom logic.
+ * Options for extending validation with custom logic.
  */
 export interface NICValidatorConfig {
+  /**
+   * Only allow New NICs.
+   */
+  onlyNew?: boolean;
+
+  /**
+   * Only allow Old NICs.
+   */
+  onlyOld?: boolean;
+
   /**
    * A custom validation function that runs after the built-in checks.
    * Throw a {@link NICError} to reject the NIC.
@@ -220,7 +249,11 @@ export interface NICValidatorConfig {
 
 /**
  * Combined options for parsing and validating a NIC.
- * Merges validation boundary overrides ({@link NICConfig}) with
- * custom validator hooks ({@link NICValidatorConfig}).
+ *
+ * This type merges validation boundary overrides ({@link NICConfig}) with
+ * custom validator hooks and format restrictions ({@link NICValidatorConfig}).
+ *
+ * Use this to apply custom business logic (`check()`), restrict allowed formats
+ * (`onlyNew`/`onlyOld`), or override default age and year boundaries.
  */
 export type NICOptions = NICValidatorConfig & NICConfig;

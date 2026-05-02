@@ -1,16 +1,19 @@
 import { daylk, Gender, NICError } from "../common";
 import { NICValidator } from "../core/nic.validator";
 import { OldNIC } from "../core/old-nic";
-import { NICConfig, NICLetter } from "../core/nic.types";
-import { OldNICState } from "./builder.types";
+import { NICConfig, NICLetter, ResolvedNICConfig } from "../core/nic.types";
+import { NICBuildingState } from "./builder.types";
 import { between, rand } from "./builder.utils";
 import { BaseNICBuilder } from "./base-nic.builder";
+import { resolveNICConfig } from "../common/utils";
 
-export class OldNICBuilder extends BaseNICBuilder<OldNICState> {
-  protected state: OldNICState;
+export class OldNICBuilder extends BaseNICBuilder {
+  protected state: NICBuildingState;
+  protected options: ResolvedNICConfig;
 
-  constructor(config: NICConfig = {}) {
-    super(config);
+  constructor(options?: NICConfig) {
+    super();
+    this.options = resolveNICConfig(OldNIC.defaultConfig, options);
     this.state = this.random();
   }
 
@@ -54,8 +57,10 @@ export class OldNICBuilder extends BaseNICBuilder<OldNICState> {
     return this;
   }
 
-  protected random(): OldNICState {
-    const year = between(1900, 1999);
+  protected random(): NICBuildingState {
+    const { minimumBirthYear, maximumBirthYear } = this.options;
+
+    const year = between(minimumBirthYear, maximumBirthYear);
 
     const days = between(1, daylk.totalDaysInYear(year));
 
@@ -81,7 +86,7 @@ export class OldNICBuilder extends BaseNICBuilder<OldNICState> {
 
     const nic = `${yearStr}${daysStr}${serial}${checkdigit}${letter}`;
 
-    NICValidator.validate(new OldNIC(nic, this.options), this.options);
+    NICValidator.validate(new OldNIC(nic, this.options));
 
     return nic;
   }

@@ -492,6 +492,32 @@ describe("NICValidator", () => {
         expect(checkCalled).toBe(false);
       });
     });
+
+    describe("type restrictions", () => {
+      it("should throw RESTRICTED_NIC_TYPE when onlyNew is true but type is OLD", () => {
+        const nic = new OldNIC("901404567V");
+        expect(() => NICValidator.validate(nic, { onlyNew: true })).toThrow(
+          errors.RESTRICTED_NIC_TYPE,
+        );
+      });
+
+      it("should pass when onlyNew is true and type is NEW", () => {
+        const nic = new NewNIC("200001501234");
+        expect(() => NICValidator.validate(nic, { onlyNew: true })).not.toThrow();
+      });
+
+      it("should throw RESTRICTED_NIC_TYPE when onlyOld is true but type is NEW", () => {
+        const nic = new NewNIC("200001501234");
+        expect(() => NICValidator.validate(nic, { onlyOld: true })).toThrow(
+          errors.RESTRICTED_NIC_TYPE,
+        );
+      });
+
+      it("should pass when onlyOld is true and type is OLD", () => {
+        const nic = new OldNIC("901404567V");
+        expect(() => NICValidator.validate(nic, { onlyOld: true })).not.toThrow();
+      });
+    });
   });
 });
 
@@ -546,6 +572,15 @@ describe("NIC (public API)", () => {
           },
         }),
       ).toThrow(TypeError);
+    });
+  });
+
+  describe(".defaultConfig", () => {
+    it("should expose defaultConfig for both new and old NICs", () => {
+      expect(NIC.defaultConfig).toBeDefined();
+      expect(NIC.defaultConfig.new).toBeDefined();
+      expect(NIC.defaultConfig.old).toBeDefined();
+      expect(NIC.defaultConfig.new.minimumAge).toBe(MINIMUM_LEGAL_AGE_TO_HAVE_NIC);
     });
   });
 

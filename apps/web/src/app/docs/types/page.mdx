@@ -8,7 +8,7 @@ export const metadata = {
 All types are exported from the package and can be imported directly:
 
 ```typescript
-import type { PublicNIC, NICConfig, ResolvedNICConfig, NICOptions, NICType, Gender, Birthday } from "@sri-lanka/nic";
+import type { NICInstance, NICConfig, NICValidatorConfig, ResolvedNICConfig, NICOptions, NICType, Gender, Birthday } from "@sri-lanka/nic";
 ```
 
 ## Enums
@@ -35,12 +35,12 @@ enum Gender {
 
 ## Interfaces
 
-### `PublicNIC`
+### `NICInstance`
 
 The object returned by `NIC.parse()`:
 
 ```typescript
-interface PublicNIC {
+interface NICInstance {
   value: string; // Sanitized NIC string
   type: NICType; // "NEW" or "OLD"
   gender: Gender; // "MALE" or "FEMALE"
@@ -91,11 +91,13 @@ interface NICConfig {
 
 ### `NICValidatorConfig`
 
-Hooks for extending validation with custom logic:
+Options for extending validation with custom logic and format restrictions:
 
 ```typescript
 interface NICValidatorConfig {
-  check?: (nic: PublicNIC, NICError: typeof NICError) => void;
+  onlyNew?: boolean;
+  onlyOld?: boolean;
+  check?: (nic: NICInstance, NICError: typeof NICError) => void;
 }
 ```
 
@@ -126,14 +128,18 @@ The shape of the main `NIC` object:
 
 ```typescript
 interface NICAPI {
-  parse(nic: string, options?: NICOptions): PublicNIC;
+  parse(nic: string, options?: NICOptions): NICInstance;
   validate(nic: string, options?: NICOptions): void;
   valid(nic: string, options?: NICOptions): boolean;
   sanitize(nic: string): string;
   getType(nic: string): NICType;
+  defaultConfig: {
+    new: ResolvedNICConfig;
+    old: ResolvedNICConfig;
+  };
   builder: {
-    new: (options?: NICOptions) => NewNICBuilder;
-    old: (options?: NICOptions) => OldNICBuilder;
+    new: (options?: NICConfig) => NewNICBuilder;
+    old: (options?: NICConfig) => OldNICBuilder;
   };
   random(): string;
 }
