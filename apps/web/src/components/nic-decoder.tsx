@@ -2,12 +2,12 @@
 
 import { useState, useCallback } from "react";
 import { NIC, NICError } from "@sri-lanka/nic";
-import type { PublicNIC } from "@sri-lanka/nic";
+import type { NICInstance } from "@sri-lanka/nic";
 import { ArrowRightLeft, Copy, Check } from "lucide-react";
 
 export function NICDecoder() {
   const [input, setInput] = useState("");
-  const [result, setResult] = useState<PublicNIC | null>(null);
+  const [result, setResult] = useState<NICInstance | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
