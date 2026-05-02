@@ -43,10 +43,17 @@ export const NIC: NICAPI = {
     return NICValidator.getType(nic);
   },
 
+  get defaultConfig() {
+    return {
+      new: NewNIC.defaultConfig,
+      old: OldNIC.defaultConfig,
+    };
+  },
+
   get builder() {
     return {
-      new: (options?: NICOptions) => new NewNICBuilder(options),
-      old: (options?: NICOptions) => new OldNICBuilder(options),
+      new: (options?: NICConfig) => new NewNICBuilder(options),
+      old: (options?: NICConfig) => new OldNICBuilder(options),
     };
   },
 

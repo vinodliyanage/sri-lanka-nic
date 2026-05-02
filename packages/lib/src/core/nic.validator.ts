@@ -1,5 +1,5 @@
 import { daylk, errors, NICError, NICType } from "../common";
-import { InternalNIC, NICConfig, NICOptions, NICValidatorConfig } from "./nic.types";
+import { InternalNIC, NICValidatorConfig } from "./nic.types";
 
 export const NICValidator = {
   sanitize(nic: string) {
@@ -20,7 +20,6 @@ export const NICValidator = {
 
   validate(nic: InternalNIC, options?: NICValidatorConfig) {
     const config = nic.config;
-    const check = options?.check;
 
     const { year, days } = nic.formatted;
 
@@ -44,6 +43,17 @@ export const NICValidator = {
 
     if (nic.age > config.maximumAge) {
       throw new NICError(errors.MAXIMUM_AGE_REQUIREMENT_NOT_MET);
+    }
+
+    // optional validation checks
+    const { onlyNew, onlyOld, check } = options || {};
+
+    if (onlyNew && nic.type !== NICType.NEW) {
+      throw new NICError(errors.RESTRICTED_NIC_TYPE);
+    }
+
+    if (onlyOld && nic.type !== NICType.OLD) {
+      throw new NICError(errors.RESTRICTED_NIC_TYPE);
     }
 
     check?.(nic, NICError);
