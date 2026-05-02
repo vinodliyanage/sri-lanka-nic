@@ -2,11 +2,11 @@ import { Birthday, daylk, Gender, NICType } from "../common";
 import { FormattedNICParts, RawNICParts, InternalNIC, ResolvedNICConfig } from "./nic.types";
 
 export abstract class BaseNIC implements InternalNIC {
-  public abstract value: string;
-  public abstract type: NICType;
+  public abstract readonly type: NICType;
+  public abstract readonly value: string;
+  public abstract readonly config: ResolvedNICConfig;
+  public abstract readonly parts: RawNICParts;
 
-  public abstract get parts(): RawNICParts;
-  public abstract get config(): ResolvedNICConfig;
   public abstract convert(): string;
 
   private _formatted: FormattedNICParts | null = null;

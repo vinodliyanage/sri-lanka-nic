@@ -4,17 +4,26 @@ import { BaseNIC } from "./base-nic";
 import { NICConfig, RawNICParts, ResolvedNICConfig } from "./nic.types";
 
 export class OldNIC extends BaseNIC {
-  public type: NICType = NICType.OLD;
-  public value: string;
+  public readonly type: NICType = NICType.OLD;
 
-  private _options: ResolvedNICConfig;
-  private _parts: RawNICParts | null = null;
+  public readonly value: string;
+  public readonly config: ResolvedNICConfig;
+  public readonly parts: RawNICParts;
 
   constructor(value: string, options?: NICConfig) {
     super();
 
     this.value = value;
-    this._options = resolveNICConfig(OldNIC.defaultConfig, options);
+
+    this.config = resolveNICConfig(OldNIC.defaultConfig, options);
+
+    this.parts = {
+      year: `19${value.substring(0, 2)}`,
+      days: value.substring(2, 5),
+      serial: value.substring(5, 8),
+      checkdigit: value.substring(8, 9),
+      letter: value.substring(9, 10),
+    };
   }
 
   static get defaultConfig(): ResolvedNICConfig {
@@ -26,24 +35,6 @@ export class OldNIC extends BaseNIC {
       minimumBirthYear: 1900,
       maximumBirthYear: 1999,
     };
-  }
-
-  get config(): ResolvedNICConfig {
-    return this._options;
-  }
-
-  get parts(): RawNICParts {
-    if (this._parts) return this._parts;
-
-    this._parts = {
-      year: `19${this.value.substring(0, 2)}`,
-      days: this.value.substring(2, 5),
-      serial: this.value.substring(5, 8),
-      checkdigit: this.value.substring(8, 9),
-      letter: this.value.substring(9, 10),
-    };
-
-    return this._parts;
   }
 
   convert(): string {
