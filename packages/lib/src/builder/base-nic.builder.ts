@@ -1,11 +1,12 @@
 import { daylk, Gender, Birthday, NICError } from "../common";
-import { NICConfig, NICOptions } from "../core/nic.types";
-import { NICState } from "./builder.types";
+import { NICBuildingState } from "./builder.types";
 import { between } from "./builder.utils";
+import { ResolvedNICConfig } from "../core/nic.types";
 
-export abstract class BaseNICBuilder<TState extends NICState> {
-  protected abstract state: TState;
-  protected abstract random(): TState;
+export abstract class BaseNICBuilder {
+  protected abstract state: NICBuildingState;
+  protected abstract options: ResolvedNICConfig;
+  protected abstract random(): NICBuildingState;
 
   /**
    * Generates, validates, and returns the final NIC string.
@@ -13,8 +14,6 @@ export abstract class BaseNICBuilder<TState extends NICState> {
    * e.g "984521234V" or "200011234567"
    */
   public abstract build(): string;
-
-  constructor(protected options: NICOptions = {}) {}
 
   /**
    * Sets the check digit.

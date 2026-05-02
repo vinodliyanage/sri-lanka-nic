@@ -1,33 +1,15 @@
 import { Birthday, daylk, Gender, NICType } from "../common";
-import {
-  FormattedNICParts,
-  RawNICParts,
-  InternalNIC,
-  ResolvedNICConfig,
-  NICConfig,
-} from "./nic.types";
+import { FormattedNICParts, RawNICParts, InternalNIC, ResolvedNICConfig } from "./nic.types";
 
 export abstract class BaseNIC implements InternalNIC {
   public abstract value: string;
   public abstract type: NICType;
-
-  protected abstract options?: NICConfig;
 
   public abstract get parts(): RawNICParts;
   public abstract get config(): ResolvedNICConfig;
   public abstract convert(): string;
 
   private _formatted: FormattedNICParts | null = null;
-
-  // internal
-  protected resolveConfig(defaults: ResolvedNICConfig): ResolvedNICConfig {
-    return {
-      minimumAge: this.options?.minimumAge ?? defaults.minimumAge,
-      maximumAge: this.options?.maximumAge ?? defaults.maximumAge,
-      minimumBirthYear: this.options?.minimumBirthYear ?? defaults.minimumBirthYear,
-      maximumBirthYear: this.options?.maximumBirthYear ?? defaults.maximumBirthYear,
-    };
-  }
 
   get formatted(): FormattedNICParts {
     if (this._formatted) return this._formatted;

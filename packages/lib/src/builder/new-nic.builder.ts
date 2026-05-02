@@ -1,16 +1,19 @@
 import { daylk, Gender, MINIMUM_LEGAL_AGE_TO_HAVE_NIC, NICError } from "../common";
 import { NewNIC } from "../core/new-nic";
 import { NICValidator } from "../core/nic.validator";
-import { NICConfig } from "../core/nic.types";
-import { NICState } from "./builder.types";
+import { NICConfig, ResolvedNICConfig } from "../core/nic.types";
+import { NICBuildingState } from "./builder.types";
 import { between, rand } from "./builder.utils";
 import { BaseNICBuilder } from "./base-nic.builder";
+import { resolveNICConfig } from "../common/utils";
 
-export class NewNICBuilder extends BaseNICBuilder<NICState> {
-  protected state: NICState;
+export class NewNICBuilder extends BaseNICBuilder {
+  protected state: NICBuildingState;
+  protected options: ResolvedNICConfig;
 
-  constructor(config: NICConfig = {}) {
-    super(config);
+  constructor(options?: NICConfig) {
+    super();
+    this.options = resolveNICConfig(NewNIC.defaultConfig, options);
     this.state = this.random();
   }
 
@@ -30,8 +33,10 @@ export class NewNICBuilder extends BaseNICBuilder<NICState> {
     return this;
   }
 
-  protected random(): NICState {
-    const year = between(1900, daylk.now.year - MINIMUM_LEGAL_AGE_TO_HAVE_NIC - 1);
+  protected random(): NICBuildingState {
+    const { minimumBirthYear, maximumBirthYear } = this.options;
+
+    const year = between(minimumBirthYear, maximumBirthYear);
 
     const days = between(1, daylk.totalDaysInYear(year));
 
@@ -55,7 +60,7 @@ export class NewNICBuilder extends BaseNICBuilder<NICState> {
 
     const nic = `${yearStr}${daysStr}${serial}${checkdigit}`;
 
-    NICValidator.validate(new NewNIC(nic, this.options), this.options);
+    NICValidator.validate(new NewNIC(nic, this.options));
 
     return nic;
   }
