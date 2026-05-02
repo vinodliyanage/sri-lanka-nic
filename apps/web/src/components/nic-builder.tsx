@@ -1,29 +1,67 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { NIC, Gender, NICError } from "@sri-lanka/nic";
+import { NIC, Gender, NICType, NICError } from "@sri-lanka/nic";
 import { Copy, Check, Shuffle, Wrench } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod/v4";
 
-type NICFormat = "new" | "old";
+const nicFormSchema = z
+  .object({
+    format: z.enum([NICType.NEW, NICType.OLD]),
+    gender: z.enum([Gender.MALE, Gender.FEMALE]),
+    year: z.coerce.number({ error: "Year is required" }).int("Year must be a whole number"),
+    month: z.coerce
+      .number({ error: "Month is required" })
+      .int()
+      .min(1, "Month must be between 1 and 12")
+      .max(12, "Month must be between 1 and 12"),
+    day: z.coerce
+      .number({ error: "Day is required" })
+      .int()
+      .min(1, "Day must be between 1 and 31")
+      .max(31, "Day must be between 1 and 31"),
+    letter: z.enum(["V", "X"]),
+  })
+  .superRefine((data, ctx) => {
+    const config = data.format === NICType.NEW ? NIC.defaultConfig.new : NIC.defaultConfig.old;
 
-interface NICFormData {
-  format: NICFormat;
-  gender: "MALE" | "FEMALE";
-  year: string;
-  month: string;
-  day: string;
-  letter: "V" | "X";
-}
+    if (data.year < config.minimumBirthYear) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["year"],
+        message: `Year must be ${config.minimumBirthYear} or later`,
+      });
+    }
+
+    if (data.year > config.maximumBirthYear) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["year"],
+        message: `Year must be ${config.maximumBirthYear} or earlier`,
+      });
+    }
+  });
+
+type NICFormData = z.infer<typeof nicFormSchema>;
 
 export function NICBuilder() {
-  const { register, handleSubmit, watch, setValue } = useForm<NICFormData>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<NICFormData>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(nicFormSchema) as any,
     defaultValues: {
-      format: "new",
-      gender: "MALE",
-      year: "1995",
-      month: "6",
-      day: "15",
+      format: NICType.NEW,
+      gender: Gender.MALE,
+      year: 1995,
+      month: 6,
+      day: 15,
       letter: "V",
     },
   });
@@ -37,12 +75,12 @@ export function NICBuilder() {
   const build = useCallback((data: NICFormData) => {
     setCopied(false);
     try {
-      const builder = data.format === "new" ? NIC.builder.new() : NIC.builder.old();
+      const builder = data.format === NICType.NEW ? NIC.builder.new() : NIC.builder.old();
 
       const birthday = {
-        year: parseInt(data.year),
-        month: parseInt(data.month),
-        day: parseInt(data.day),
+        year: data.year,
+        month: data.month,
+        day: data.day,
       };
 
       const gender = data.gender === "MALE" ? Gender.MALE : Gender.FEMALE;
@@ -90,9 +128,9 @@ export function NICBuilder() {
           <div className="mt-1.5 flex gap-2">
             <button
               type="button"
-              onClick={() => setValue("format", "new")}
+              onClick={() => setValue("format", NICType.NEW)}
               className={`flex-1 rounded-lg border px-3 py-2 text-sm transition-all ${
-                format === "new"
+                format === NICType.NEW
                   ? "border-accent bg-accent-light font-medium text-accent"
                   : "border-border text-text-secondary hover:border-border-strong"
               }`}
@@ -101,9 +139,9 @@ export function NICBuilder() {
             </button>
             <button
               type="button"
-              onClick={() => setValue("format", "old")}
+              onClick={() => setValue("format", NICType.OLD)}
               className={`flex-1 rounded-lg border px-3 py-2 text-sm transition-all ${
-                format === "old"
+                format === NICType.OLD
                   ? "border-accent bg-accent-light font-medium text-accent"
                   : "border-border text-text-secondary hover:border-border-strong"
               }`}
@@ -122,13 +160,13 @@ export function NICBuilder() {
             {...register("gender")}
             className="mt-1.5 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
           >
-            <option value="MALE">Male</option>
-            <option value="FEMALE">Female</option>
+            <option value={Gender.MALE}>Male</option>
+            <option value={Gender.FEMALE}>Female</option>
           </select>
         </div>
 
         {/* Letter (old only) */}
-        {format === "old" && (
+        {format === NICType.OLD && (
           <div>
             <label className="text-xs font-medium text-text-muted uppercase tracking-wider">
               Letter
@@ -151,10 +189,9 @@ export function NICBuilder() {
           <input
             type="number"
             {...register("year")}
-            min={1900}
-            max={2010}
-            className="mt-1.5 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+            className={`mt-1.5 w-full rounded-lg border bg-surface px-3 py-2 text-sm outline-none focus:border-accent ${errors.year ? "border-red-500" : "border-border"}`}
           />
+          {errors.year && <p className="mt-1 text-xs text-red-500">{errors.year.message}</p>}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -167,8 +204,9 @@ export function NICBuilder() {
               {...register("month")}
               min={1}
               max={12}
-              className="mt-1.5 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+              className={`mt-1.5 w-full rounded-lg border bg-surface px-3 py-2 text-sm outline-none focus:border-accent ${errors.month ? "border-red-500" : "border-border"}`}
             />
+            {errors.month && <p className="mt-1 text-xs text-red-500">{errors.month.message}</p>}
           </div>
           <div>
             <label className="text-xs font-medium text-text-muted uppercase tracking-wider">
@@ -179,8 +217,9 @@ export function NICBuilder() {
               {...register("day")}
               min={1}
               max={31}
-              className="mt-1.5 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+              className={`mt-1.5 w-full rounded-lg border bg-surface px-3 py-2 text-sm outline-none focus:border-accent ${errors.day ? "border-red-500" : "border-border"}`}
             />
+            {errors.day && <p className="mt-1 text-xs text-red-500">{errors.day.message}</p>}
           </div>
         </div>
       </div>
