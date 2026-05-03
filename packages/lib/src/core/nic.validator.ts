@@ -19,10 +19,22 @@ export const NICValidator = {
   },
 
   validate(nic: InternalNIC, options?: NICValidatorConfig) {
+    // nic pre validations
+
+    const { onlyNew, onlyOld, check } = options || {};
+
+    if (onlyNew && nic.type !== NICType.NEW) {
+      throw new NICError(errors.RESTRICTED_NIC_TYPE);
+    }
+
+    if (onlyOld && nic.type !== NICType.OLD) {
+      throw new NICError(errors.RESTRICTED_NIC_TYPE);
+    }
+
+    // nic logical validations
+
     const config = nic.config;
-
     const { year, days } = nic.formatted;
-
     const totalDaysInBirthYear = daylk.totalDaysInYear(year);
 
     if (year < config.minimumBirthYear) {
@@ -45,16 +57,7 @@ export const NICValidator = {
       throw new NICError(errors.MAXIMUM_AGE_REQUIREMENT_NOT_MET);
     }
 
-    // optional validation checks
-    const { onlyNew, onlyOld, check } = options || {};
-
-    if (onlyNew && nic.type !== NICType.NEW) {
-      throw new NICError(errors.RESTRICTED_NIC_TYPE);
-    }
-
-    if (onlyOld && nic.type !== NICType.OLD) {
-      throw new NICError(errors.RESTRICTED_NIC_TYPE);
-    }
+    // nic post validations
 
     check?.(nic, NICError);
   },
