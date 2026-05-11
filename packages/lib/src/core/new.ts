@@ -1,7 +1,7 @@
 import { daylk, errors, MINIMUM_LEGAL_AGE_TO_HAVE_NIC, NICError, NICType } from "../common";
 import { resolveNICConfig } from "../common/utils";
-import { BaseNIC } from "./base-nic";
-import { NICConfig, RawNICParts, ResolvedNICConfig } from "./nic.types";
+import { BaseNIC } from "./base";
+import { NICConfig, RawNICParts, ResolvedNICConfig } from "./types";
 
 export class NewNIC extends BaseNIC {
   public readonly type: NICType = NICType.NEW;

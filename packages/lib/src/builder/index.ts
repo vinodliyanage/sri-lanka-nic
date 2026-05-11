@@ -1,2 +1,2 @@
-export { NewNICBuilder } from "./new-nic.builder";
-export { OldNICBuilder } from "./old-nic.builder";
+export { NewNICBuilder } from "./new";
+export { OldNICBuilder } from "./old";

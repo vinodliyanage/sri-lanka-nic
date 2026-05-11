@@ -1,10 +1,10 @@
 import { daylk, Gender, MINIMUM_LEGAL_AGE_TO_HAVE_NIC, NICError } from "../common";
-import { NewNIC } from "../core/new-nic";
-import { NICValidator } from "../core/nic.validator";
-import { NICConfig, ResolvedNICConfig } from "../core/nic.types";
-import { NICBuildingState } from "./builder.types";
-import { between, rand } from "./builder.utils";
-import { BaseNICBuilder } from "./base-nic.builder";
+import { NewNIC } from "../core/new";
+import { NICValidator } from "../core/validator";
+import { NICConfig, ResolvedNICConfig } from "../core/types";
+import { NICBuildingState } from "./types";
+import { between, rand } from "./utils";
+import { BaseNICBuilder } from "./base";
 import { resolveNICConfig } from "../common/utils";
 
 export class NewNICBuilder extends BaseNICBuilder {

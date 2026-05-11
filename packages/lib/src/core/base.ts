@@ -1,5 +1,5 @@
 import { Birthday, daylk, Gender, NICType } from "../common";
-import { FormattedNICParts, RawNICParts, InternalNIC, ResolvedNICConfig } from "./nic.types";
+import { FormattedNICParts, RawNICParts, InternalNIC, ResolvedNICConfig } from "./types";
 
 export abstract class BaseNIC implements InternalNIC {
   public abstract readonly type: NICType;

@@ -1,4 +1,4 @@
-import { NICConfig, ResolvedNICConfig } from "../core/nic.types";
+import { NICConfig, ResolvedNICConfig } from "../core/types";
 
 export function resolveNICConfig(defaults: ResolvedNICConfig, options?: NICConfig) {
   return {

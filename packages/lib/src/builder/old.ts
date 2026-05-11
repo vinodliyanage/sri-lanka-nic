@@ -1,10 +1,10 @@
 import { daylk, Gender, NICError } from "../common";
-import { NICValidator } from "../core/nic.validator";
-import { OldNIC } from "../core/old-nic";
-import { NICConfig, NICLetter, ResolvedNICConfig } from "../core/nic.types";
-import { NICBuildingState } from "./builder.types";
-import { between, rand } from "./builder.utils";
-import { BaseNICBuilder } from "./base-nic.builder";
+import { NICValidator } from "../core/validator";
+import { OldNIC } from "../core/old";
+import { NICConfig, NICLetter, ResolvedNICConfig } from "../core/types";
+import { NICBuildingState } from "./types";
+import { between, rand } from "./utils";
+import { BaseNICBuilder } from "./base";
 import { resolveNICConfig } from "../common/utils";
 
 export class OldNICBuilder extends BaseNICBuilder {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { resolveNICConfig } from "./utils";
-import { ResolvedNICConfig } from "../core/nic.types";
+import { ResolvedNICConfig } from "../core/types";
 
 describe("resolveNICConfig", () => {
   const defaults: ResolvedNICConfig = {

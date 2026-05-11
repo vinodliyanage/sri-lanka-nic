@@ -1,5 +1,5 @@
 import { daylk, errors, NICError, NICType } from "../common";
-import { InternalNIC, NICValidatorConfig } from "./nic.types";
+import { InternalNIC, NICValidatorConfig } from "./types";
 
 export const NICValidator = {
   sanitize(nic: string) {

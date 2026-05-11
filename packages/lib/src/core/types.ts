@@ -1,6 +1,6 @@
 import { Gender, NICType, NICError } from "../common";
-import { NewNICBuilder } from "../builder/new-nic.builder";
-import { OldNICBuilder } from "../builder/old-nic.builder";
+import { NewNICBuilder } from "../builder/new";
+import { OldNICBuilder } from "../builder/old";
 
 /**
  * The main object for parsing, validating, and generating Sri Lankan NICs.

@@ -1,8 +1,8 @@
 import { NICError, NICType } from "../common";
-import { NewNIC } from "./new-nic";
-import { OldNIC } from "./old-nic";
-import { NICValidator } from "./nic.validator";
-import { NICConfig, InternalNIC, PublicNIC as NICInstance, NICAPI, NICOptions } from "./nic.types";
+import { NewNIC } from "./new";
+import { OldNIC } from "./old";
+import { NICValidator } from "./validator";
+import { NICConfig, InternalNIC, PublicNIC as NICInstance, NICAPI, NICOptions } from "./types";
 import { NewNICBuilder, OldNICBuilder } from "../builder";
 
 export const NIC: NICAPI = {

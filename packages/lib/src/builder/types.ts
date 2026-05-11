@@ -1,5 +1,5 @@
 import { Gender } from "../common";
-import { NICLetter } from "../core/nic.types";
+import { NICLetter } from "../core/types";
 
 /**
  * Holds the current state while building a NIC string.

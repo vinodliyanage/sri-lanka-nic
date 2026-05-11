@@ -1,7 +1,7 @@
 import { daylk, Gender, Birthday, NICError } from "../common";
-import { NICBuildingState } from "./builder.types";
-import { between, rand } from "./builder.utils";
-import { ResolvedNICConfig } from "../core/nic.types";
+import { NICBuildingState } from "./types";
+import { between, rand } from "./utils";
+import { ResolvedNICConfig } from "../core/types";
 
 export abstract class BaseNICBuilder {
   protected abstract state: NICBuildingState;

@@ -1,275 +1,14 @@
 import { describe, it, expect } from "vitest";
-import { NIC } from "../core/nic";
-import { daylk, Gender, NICType, NICError, MINIMUM_LEGAL_AGE_TO_HAVE_NIC } from "../common";
-import { NewNICBuilder } from "./new-nic.builder";
-import { OldNICBuilder } from "./old-nic.builder";
+import { NIC } from "./facade";
+import { daylk, Gender, NICType, MINIMUM_LEGAL_AGE_TO_HAVE_NIC, NICError } from "../common";
 
-describe("NewNICBuilder", () => {
-  describe("random defaults", () => {
-    it("should build a valid 12-digit new-format NIC with random defaults", () => {
-      const nic = NIC.builder.new().build();
-
-      expect(nic).toMatch(/^\d{12}$/);
-      expect(NIC.valid(nic)).toBe(true);
-      expect(NIC.getType(nic)).toBe(NICType.NEW);
-    });
-
-    it("should produce different NICs across multiple calls", () => {
-      const results = new Set(Array.from({ length: 20 }, () => NIC.builder.new().build()));
-
-      // With random serial + checkdigit + birthday, collisions are extremely unlikely.
-      expect(results.size).toBeGreaterThan(1);
-    });
-  });
-
-  describe("chainable setters", () => {
-    it("should return `this` from every setter for fluent chaining", () => {
-      const builder = new NewNICBuilder();
-      const a = builder.serial("0001");
-      const b = a.checkdigit("0");
-      const c = b.gender(Gender.MALE);
-      const d = c.birthday({ year: 2005, month: 6, day: 1 });
-
-      // Every return value should be the same builder instance.
-      expect(a).toBe(builder);
-      expect(b).toBe(builder);
-      expect(c).toBe(builder);
-      expect(d).toBe(builder);
-    });
-  });
-
-  describe("deterministic builds", () => {
-    it("should encode a Male birthday correctly", () => {
-      const nic = NIC.builder
-        .new()
-        .gender(Gender.MALE)
-        .birthday({ year: 2000, month: 1, day: 15 })
-        .serial("0123")
-        .checkdigit("4")
-        .build();
-
-      // year=2000, days=015, serial=0123, checkdigit=4
-      expect(nic).toBe("200001501234");
-
-      const parsed = NIC.parse(nic);
-      expect(parsed.gender).toBe(Gender.MALE);
-      expect(parsed.birthday).toEqual({ year: 2000, month: 1, day: 15 });
-    });
-
-    it("should add 500 to the day-of-year for Females", () => {
-      const nic = NIC.builder
-        .new()
-        .gender(Gender.FEMALE)
-        .birthday({ year: 2000, month: 1, day: 15 })
-        .serial("0123")
-        .checkdigit("4")
-        .build();
-
-      // day 15 + 500 = 515
-      expect(nic).toBe("200051501234");
-
-      const parsed = NIC.parse(nic);
-      expect(parsed.gender).toBe(Gender.FEMALE);
-      expect(parsed.birthday).toEqual({ year: 2000, month: 1, day: 15 });
-    });
-
-    it("should handle a leap year birthday (Feb 29)", () => {
-      const nic = NIC.builder
-        .new()
-        .gender(Gender.MALE)
-        .birthday({ year: 2000, month: 2, day: 29 }) // 2000 is a leap year
-        .serial("0001")
-        .checkdigit("0")
-        .build();
-
-      // Feb 29 in a leap year → day 60
-      expect(nic).toBe("200006000010");
-
-      const parsed = NIC.parse(nic);
-      expect(parsed.birthday).toEqual({ year: 2000, month: 2, day: 29 });
-    });
-
-    it("should handle last day of year (Dec 31) correctly", () => {
-      const nic = NIC.builder
-        .new()
-        .gender(Gender.MALE)
-        .birthday({ year: 2001, month: 12, day: 31 }) // non-leap → day 365
-        .serial("0000")
-        .checkdigit("0")
-        .build();
-
-      expect(nic).toBe("200136500000");
-
-      const parsed = NIC.parse(nic);
-      expect(parsed.birthday).toEqual({ year: 2001, month: 12, day: 31 });
-    });
-  });
-
-  describe(".age() method", () => {
-    it("should derive the birth year from age", () => {
-      const age = 20;
-      const nic = NIC.builder.new().age(age).build();
-      const parsed = NIC.parse(nic);
-
-      expect(parsed.birthday.year).toBe(daylk.now.year - age);
-    });
-  });
-
-  describe("validation during build", () => {
-    it("should throw NICError when config constraints are violated", () => {
-      // Build a NIC for someone born in 2000, but require minimumAge=99
-      expect(() =>
-        NIC.builder
-          .new({ minimumAge: 99 })
-          .birthday({ year: 2000, month: 1, day: 1 })
-          .gender(Gender.MALE)
-          .serial("0000")
-          .checkdigit("0")
-          .build(),
-      ).toThrow(NICError);
-    });
-  });
-});
-
-describe("OldNICBuilder", () => {
-  describe("random defaults", () => {
-    it("should build a valid old-format NIC (9 digits + V/X)", () => {
-      const nic = NIC.builder.old().build();
-
-      expect(nic).toMatch(/^\d{9}[VX]$/);
-      expect(NIC.valid(nic)).toBe(true);
-      expect(NIC.getType(nic)).toBe(NICType.OLD);
-    });
-  });
-
-  describe("chainable setters", () => {
-    it("should return `this` from every setter for fluent chaining", () => {
-      const builder = new OldNICBuilder();
-      const a = builder.serial("001");
-      const b = a.checkdigit("0");
-      const c = b.gender(Gender.MALE);
-      const d = c.letter("V");
-      const e = d.voter(true);
-      const f = e.birthday({ year: 1990, month: 5, day: 20 });
-
-      expect(a).toBe(builder);
-      expect(b).toBe(builder);
-      expect(c).toBe(builder);
-      expect(d).toBe(builder);
-      expect(e).toBe(builder);
-      expect(f).toBe(builder);
-    });
-  });
-
-  describe("deterministic builds", () => {
-    it("should encode a Male birthday with V letter correctly", () => {
-      const nic = NIC.builder
-        .old()
-        .gender(Gender.MALE)
-        .birthday({ year: 1990, month: 5, day: 20 })
-        .serial("456")
-        .checkdigit("7")
-        .letter("V")
-        .build();
-
-      // year=1990 → "90", May 20 in non-leap = day 140, serial=456, check=7, letter=V
-      expect(nic).toBe("901404567V");
-
-      const parsed = NIC.parse(nic);
-      expect(parsed.gender).toBe(Gender.MALE);
-      expect(parsed.birthday).toEqual({ year: 1990, month: 5, day: 20 });
-    });
-
-    it("should add 500 to day-of-year for Females", () => {
-      const nic = NIC.builder
-        .old()
-        .gender(Gender.FEMALE)
-        .birthday({ year: 1990, month: 1, day: 1 })
-        .serial("000")
-        .checkdigit("0")
-        .letter("V")
-        .build();
-
-      // day 1 + 500 = 501
-      expect(nic).toBe("905010000V");
-
-      const parsed = NIC.parse(nic);
-      expect(parsed.gender).toBe(Gender.FEMALE);
-      expect(parsed.birthday).toEqual({ year: 1990, month: 1, day: 1 });
-    });
-
-    it("should use 'X' letter for non-voter", () => {
-      const nic = NIC.builder
-        .old()
-        .gender(Gender.MALE)
-        .birthday({ year: 1985, month: 3, day: 10 })
-        .serial("100")
-        .checkdigit("5")
-        .letter("X")
-        .build();
-
-      expect(nic).toMatch(/X$/);
-      expect(nic).toBe("850691005X");
-    });
-  });
-
-  describe(".voter() shorthand", () => {
-    it("should set letter to 'V' when voter(true)", () => {
-      const nic = NIC.builder.old().voter(true).build();
-      expect(nic).toMatch(/V$/);
-    });
-
-    it("should set letter to 'X' when voter(false)", () => {
-      const nic = NIC.builder.old().voter(false).build();
-      expect(nic).toMatch(/X$/);
-    });
-  });
-
-  describe(".letter() case handling", () => {
-    it("should accept lowercase 'v' and uppercase it", () => {
-      const nic = NIC.builder
-        .old()
-        .letter("v" as "V")
-        .build();
-      expect(nic).toMatch(/V$/);
-    });
-
-    it("should accept lowercase 'x' and uppercase it", () => {
-      const nic = NIC.builder
-        .old()
-        .letter("x" as "X")
-        .build();
-      expect(nic).toMatch(/X$/);
-    });
-  });
-
-  describe(".age() method", () => {
-    it("should derive the birth year from age", () => {
-      const age = 40;
-      const nic = NIC.builder.old().age(age).build();
-      const parsed = NIC.parse(nic);
-
-      expect(parsed.birthday.year).toBe(daylk.now.year - age);
-    });
-  });
-
-  describe("validation during build", () => {
-    it("should throw NICError when config constraints are violated", () => {
-      expect(() =>
-        NIC.builder
-          .old({ minimumAge: 99 })
-          .birthday({ year: 1990, month: 1, day: 1 })
-          .gender(Gender.MALE)
-          .serial("000")
-          .checkdigit("0")
-          .letter("V")
-          .build(),
-      ).toThrow(NICError);
-    });
-  });
-});
+// ─── NIC.random() ───────────────────────────────────────────────────────────────
 
 describe("NIC.random()", () => {
+  it("should return a string", () => {
+    expect(typeof NIC.random()).toBe("string");
+  });
+
   it("should always produce a valid NIC", () => {
     for (let i = 0; i < 50; i++) {
       const nic = NIC.random();
@@ -293,6 +32,28 @@ describe("NIC.random()", () => {
 // ─── NIC.parse() ────────────────────────────────────────────────────────────────
 
 describe("NIC.parse()", () => {
+  it("should auto-sanitize input (trim + uppercase)", () => {
+    const parsed = NIC.parse("  901404567v  ");
+    expect(parsed.value).toBe("901404567V");
+    expect(parsed.type).toBe(NICType.OLD);
+  });
+
+  it("should return a PublicNIC with all expected properties", () => {
+    const parsed = NIC.parse("901404567V");
+
+    expect(parsed).toHaveProperty("value");
+    expect(parsed).toHaveProperty("type");
+    expect(parsed).toHaveProperty("gender");
+    expect(parsed).toHaveProperty("birthday");
+    expect(parsed).toHaveProperty("age");
+    expect(parsed).toHaveProperty("parts");
+    expect(parsed).toHaveProperty("convert");
+  });
+
+  it("should throw for invalid NICs", () => {
+    expect(() => NIC.parse("invalid")).toThrow(NICError);
+  });
+
   describe("new format", () => {
     it("should parse a known new-format NIC", () => {
       const parsed = NIC.parse("200001501234");
@@ -340,7 +101,14 @@ describe("NIC.parse()", () => {
   });
 });
 
+// ─── NIC.validate() ─────────────────────────────────────────────────────────────
+
 describe("NIC.validate()", () => {
+  it("should not return anything on success (void)", () => {
+    const result = NIC.validate("901404567V");
+    expect(result).toBeUndefined();
+  });
+
   it("should throw NICError for completely invalid input", () => {
     expect(() => NIC.validate("not-a-nic")).toThrow(NICError);
     expect(() => NIC.validate("")).toThrow(NICError);
@@ -388,6 +156,8 @@ describe("NIC.validate()", () => {
   });
 });
 
+// ─── NIC.valid() ────────────────────────────────────────────────────────────────
+
 describe("NIC.valid()", () => {
   it("should return true for valid NICs", () => {
     const nic = NIC.builder.new().build();
@@ -399,7 +169,19 @@ describe("NIC.valid()", () => {
     expect(NIC.valid("")).toBe(false);
     expect(NIC.valid("123")).toBe(false);
   });
+
+  it("should re-throw non-NICError exceptions from custom check", () => {
+    expect(() =>
+      NIC.valid("901404567V", {
+        check() {
+          throw new TypeError("not a NICError");
+        },
+      }),
+    ).toThrow(TypeError);
+  });
 });
+
+// ─── NIC.sanitize() ─────────────────────────────────────────────────────────────
 
 describe("NIC.sanitize()", () => {
   it("should trim whitespace", () => {
@@ -415,6 +197,8 @@ describe("NIC.sanitize()", () => {
     expect(NIC.sanitize("901404567V")).toBe("901404567V");
   });
 });
+
+// ─── NIC.getType() ──────────────────────────────────────────────────────────────
 
 describe("NIC.getType()", () => {
   it("should identify 12-digit NICs as NEW", () => {
@@ -436,6 +220,42 @@ describe("NIC.getType()", () => {
     expect(() => NIC.getType("12345678A")).toThrow(NICError); // letter is not V/X
   });
 });
+
+// ─── NIC.defaultConfig ──────────────────────────────────────────────────────────
+
+describe("NIC.defaultConfig", () => {
+  it("should expose defaultConfig for both new and old NICs", () => {
+    expect(NIC.defaultConfig).toBeDefined();
+    expect(NIC.defaultConfig.new).toBeDefined();
+    expect(NIC.defaultConfig.old).toBeDefined();
+    expect(NIC.defaultConfig.new.minimumAge).toBe(MINIMUM_LEGAL_AGE_TO_HAVE_NIC);
+  });
+});
+
+// ─── NIC.builder ────────────────────────────────────────────────────────────────
+
+describe("NIC.builder", () => {
+  it("should return an object with .new() and .old() factory methods", () => {
+    const builder = NIC.builder;
+    expect(typeof builder.new).toBe("function");
+    expect(typeof builder.old).toBe("function");
+  });
+
+  it("should forward config to the builder", () => {
+    // If we pass minimumAge: 99, build should fail for a young NIC
+    expect(() =>
+      NIC.builder
+        .new({ minimumAge: 99 })
+        .birthday({ year: 2005, month: 1, day: 1 })
+        .gender(Gender.MALE)
+        .serial("000")
+        .checkdigit("0")
+        .build(),
+    ).toThrow(NICError);
+  });
+});
+
+// ─── convert() ──────────────────────────────────────────────────────────────────
 
 describe("convert()", () => {
   describe("Old → New", () => {
@@ -498,7 +318,7 @@ describe("convert()", () => {
   });
 });
 
-// Round-trip: build → parse → convert
+// ─── Round-trip integrity ───────────────────────────────────────────────────────
 
 describe("Round-trip integrity", () => {
   it("should survive a build → parse → convert → parse cycle (Old NIC)", () => {

@@ -1,7 +1,7 @@
-export { NIC } from "./nic";
-export { NICValidator } from "./nic.validator";
-export { NewNIC } from "./new-nic";
-export { OldNIC } from "./old-nic";
+export { NIC } from "./facade";
+export { NICValidator } from "./validator";
+export { NewNIC } from "./new";
+export { OldNIC } from "./old";
 export type {
   NICAPI,
   NICConfig,
@@ -14,4 +14,4 @@ export type {
   RawNICParts,
   FormattedNICParts,
   NICLetter,
-} from "./nic.types";
+} from "./types";
