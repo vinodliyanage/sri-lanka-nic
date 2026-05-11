@@ -1,6 +1,6 @@
 import { daylk, Gender, Birthday, NICError } from "../common";
 import { NICBuildingState } from "./builder.types";
-import { between } from "./builder.utils";
+import { between, rand } from "./builder.utils";
 import { ResolvedNICConfig } from "../core/nic.types";
 
 export abstract class BaseNICBuilder {
@@ -63,8 +63,23 @@ export abstract class BaseNICBuilder {
    * @example builder.age(25)
    */
   age(age: number) {
-    const year = daylk.now.year - age;
-    this.state.days = between(1, daylk.totalDaysInYear(year));
+    const now = daylk.now;
+    const todayDayOfYear = daylk.dayOfYear(now.year, now.month, now.day);
+    const totalDaysThisYear = daylk.totalDaysInYear(now.year);
+
+    const birthdayPassed = rand() < todayDayOfYear / totalDaysThisYear;
+    const year = birthdayPassed ? now.year - age : now.year - age - 1;
+
+    if (birthdayPassed) {
+      // Born this many years ago, birthday on or before today
+      const maxDay = daylk.dayOfYear(year, now.month, now.day);
+      this.state.days = between(1, maxDay);
+    } else {
+      // Born one more year ago, birthday is after today
+      const minDay = daylk.dayOfYear(year, now.month, now.day) + 1;
+      this.state.days = between(minDay, daylk.totalDaysInYear(year));
+    }
+
     this.state.year = year;
     return this;
   }
