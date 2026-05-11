@@ -29,6 +29,11 @@ export const daylk = {
     return totals[month - 1] + day + leapOffset;
   },
 
+  currentDayOfYear() {
+    const now = this.now;
+    return this.dayOfYear(now.year, now.month, now.day);
+  },
+
   totalDaysInYear(year: number) {
     return this.isLeap(year) ? 366 : 365;
   },
