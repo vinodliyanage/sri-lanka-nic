@@ -8,7 +8,7 @@ export const metadata = {
 All types are exported from the package and can be imported directly:
 
 ```typescript
-import type { NICInstance, NICConfig, NICValidatorConfig, ResolvedNICConfig, NICOptions, NICType, Gender, Birthday } from "@sri-lanka/nic";
+import type { NICInstance, NICConfig, NICValidatorConfig, ResolvedNICConfig, NICOptions, NICType, Gender, Birthday, SafeParseResult } from "@sri-lanka/nic";
 ```
 
 ## Enums
@@ -122,6 +122,28 @@ interface ResolvedNICConfig {
 }
 ```
 
+### `SafeParseResult`
+
+A discriminated union returned by `NIC.safeParse()`:
+
+```typescript
+type SafeParseResult =
+  | { success: true; data: NICInstance }
+  | { success: false; error: Error };
+```
+
+Use the `success` flag to narrow the type:
+
+```typescript
+const result = NIC.safeParse("901404567V");
+
+if (result.success) {
+  result.data.gender; // ✅ NICInstance
+} else {
+  result.error.message; // ✅ Error
+}
+```
+
 ### `NICAPI`
 
 The shape of the main `NIC` object:
@@ -129,6 +151,7 @@ The shape of the main `NIC` object:
 ```typescript
 interface NICAPI {
   parse(nic: string, options?: NICOptions): NICInstance;
+  safeParse(nic: string, options?: NICOptions): SafeParseResult;
   validate(nic: string, options?: NICOptions): void;
   valid(nic: string, options?: NICOptions): boolean;
   sanitize(nic: string): string;

@@ -14,4 +14,5 @@ export type {
   RawNICParts,
   FormattedNICParts,
   NICLetter,
+  SafeParseResult,
 } from "./types";

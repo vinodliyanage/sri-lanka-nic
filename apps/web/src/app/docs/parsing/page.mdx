@@ -36,6 +36,36 @@ You can also sanitize manually:
 NIC.sanitize("  901404567v  "); // "901404567V"
 ```
 
+## Safe Parsing
+
+If you'd rather not deal with `try/catch`, use `NIC.safeParse()`. It returns a result object instead of throwing:
+
+```typescript
+const result = NIC.safeParse("901404567V");
+
+if (result.success) {
+  console.log(result.data.gender); // "MALE"
+  console.log(result.data.birthday); // { year: 1990, month: 5, day: 20 }
+} else {
+  console.log(result.error.message); // error details
+}
+```
+
+This is especially useful in form handlers, API routes, or anywhere you want to handle success and failure in a single code path without exceptions:
+
+```typescript
+// In an API route
+const result = NIC.safeParse(req.body.nic);
+
+if (!result.success) {
+  return res.status(400).json({ error: result.error.message });
+}
+
+return res.json({ gender: result.data.gender, age: result.data.age });
+```
+
+> **Tip**: `safeParse` accepts the same `options` as `parse`, including custom `check` callbacks, `onlyNew`/`onlyOld`, and boundary overrides.
+
 ## Format Detection
 
 The library auto-detects the NIC format:

@@ -3,6 +3,39 @@ import { NewNICBuilder } from "../builder/new";
 import { OldNICBuilder } from "../builder/old";
 
 /**
+ * The result of {@link NICAPI.safeParse}.
+ *
+ * Either `{ success: true, data }` with the parsed NIC, or
+ * `{ success: false, error }` with the error that occurred.
+ *
+ * Use the `success` flag to narrow the type before accessing `data` or `error`.
+ *
+ * @example
+ * const result = NIC.safeParse("901404567V");
+ *
+ * if (result.success) {
+ *   console.log(result.data.gender); // "MALE"
+ * } else {
+ *   console.log(result.error.message); // error details
+ * }
+ *
+ * @see {@link NICAPI.safeParse}
+ */
+export type SafeParseResult =
+  | {
+      /** Indicates the parse succeeded. */
+      success: true;
+      /** The parsed NIC data. */
+      data: PublicNIC;
+    }
+  | {
+      /** Indicates the parse failed. */
+      success: false;
+      /** The error that was thrown during parsing. */
+      error: Error;
+    };
+
+/**
  * The main object for parsing, validating, and generating Sri Lankan NICs.
  */
 export interface NICAPI {
@@ -11,6 +44,12 @@ export interface NICAPI {
    * @throws {NICError} If the NIC string is invalid or fails validation constraints.
    */
   parse(nic: string, options?: NICOptions): PublicNIC;
+
+  /**
+   * Safely parses a NIC string without throwing errors. Returns a result object that
+   * indicates success or failure along with the parsed data or error.
+   */
+  safeParse(nic: string, options?: NICOptions): SafeParseResult;
 
   /**
    * Checks if a NIC is valid. Throws an error if it's not.

@@ -52,6 +52,26 @@ console.log(result.gender); // "MALE"
 console.log(result.birthday); // { year: 1990, month: 5, day: 20 }
 ```
 
+### With `safeParse`
+
+You can simplify the Zod transform by using `NIC.safeParse()` instead of wrapping `parse` in `try/catch`:
+
+```typescript
+const nicWithDetails = z.string().transform((value, ctx) => {
+  const result = NIC.safeParse(value);
+
+  if (!result.success) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: result.error.message,
+    });
+    return z.NEVER;
+  }
+
+  return result.data;
+});
+```
+
 ---
 
 ## With React Hook Form

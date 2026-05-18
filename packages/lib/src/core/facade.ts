@@ -2,7 +2,14 @@ import { NICError, NICType } from "../common";
 import { NewNIC } from "./new";
 import { OldNIC } from "./old";
 import { NICValidator } from "./validator";
-import { NICConfig, InternalNIC, PublicNIC as NICInstance, NICAPI, NICOptions } from "./types";
+import {
+  NICConfig,
+  InternalNIC,
+  PublicNIC as NICInstance,
+  NICAPI,
+  NICOptions,
+  SafeParseResult,
+} from "./types";
 import { NewNICBuilder, OldNICBuilder } from "../builder";
 
 export const NIC: NICAPI = {
@@ -19,6 +26,15 @@ export const NIC: NICAPI = {
     NICValidator.validate(instance, options);
 
     return instance as NICInstance;
+  },
+
+  safeParse(nic: string, options?: NICOptions): SafeParseResult {
+    try {
+      const data = this.parse(nic, options);
+      return { success: true, data };
+    } catch (error) {
+      return { success: false, error: error as Error };
+    }
   },
 
   validate(nic: string, options?: NICOptions) {

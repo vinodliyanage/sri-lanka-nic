@@ -181,6 +181,89 @@ describe("NIC.valid()", () => {
   });
 });
 
+// ─── NIC.safeParse() ────────────────────────────────────────────────────────────
+
+describe("NIC.safeParse()", () => {
+  it("should return { success: true, data } for valid NICs", () => {
+    const result = NIC.safeParse("901404567V");
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.value).toBe("901404567V");
+      expect(result.data.type).toBe(NICType.OLD);
+      expect(result.data.gender).toBe(Gender.MALE);
+      expect(result.data.birthday).toEqual({ year: 1990, month: 5, day: 20 });
+    }
+  });
+
+  it("should return { success: false, error } for invalid NICs", () => {
+    const result = NIC.safeParse("invalid");
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toBeInstanceOf(Error);
+      expect(result.error).toBeInstanceOf(NICError);
+    }
+  });
+
+  it("should never throw, even for completely garbage input", () => {
+    expect(() => NIC.safeParse("")).not.toThrow();
+    expect(() => NIC.safeParse("abc")).not.toThrow();
+    expect(() => NIC.safeParse("12345")).not.toThrow();
+  });
+
+  it("should forward options to parse", () => {
+    const nic = NIC.builder
+      .new()
+      .gender(Gender.MALE)
+      .birthday({ year: daylk.now.year - 20, month: 1, day: 1 })
+      .serial("0000")
+      .checkdigit("0")
+      .build();
+
+    const strict = NIC.safeParse(nic, { minimumAge: 30 });
+    expect(strict.success).toBe(false);
+
+    const relaxed = NIC.safeParse(nic, { minimumAge: 15 });
+    expect(relaxed.success).toBe(true);
+  });
+
+  it("should wrap custom check errors in the failure result", () => {
+    const result = NIC.safeParse("901404567V", {
+      check(parsed, Err) {
+        if (parsed.gender === Gender.MALE) {
+          throw new Err("Males not allowed");
+        }
+      },
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.message).toBe("Males not allowed");
+    }
+  });
+
+  it("should auto-sanitize input just like parse", () => {
+    const result = NIC.safeParse("  901404567v  ");
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.value).toBe("901404567V");
+    }
+  });
+
+  it("should work with both old and new format NICs", () => {
+    const oldResult = NIC.safeParse("901404567V");
+    const newResult = NIC.safeParse("200001501234");
+
+    expect(oldResult.success).toBe(true);
+    expect(newResult.success).toBe(true);
+
+    if (oldResult.success) expect(oldResult.data.type).toBe(NICType.OLD);
+    if (newResult.success) expect(newResult.data.type).toBe(NICType.NEW);
+  });
+});
+
 // ─── NIC.sanitize() ─────────────────────────────────────────────────────────────
 
 describe("NIC.sanitize()", () => {

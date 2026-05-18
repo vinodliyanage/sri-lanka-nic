@@ -29,6 +29,22 @@ NIC.valid("invalid"); // false
 
 > **Tip**: `NIC.valid()` only catches `NICError`. If your custom `check` function throws a different error type (like `TypeError`), it will still propagate.
 
+## `NIC.safeParse()`
+
+Returns a result object with either the parsed data or the error. Never throws:
+
+```typescript
+const result = NIC.safeParse("901404567V");
+
+if (result.success) {
+  console.log(result.data.gender); // "MALE"
+} else {
+  console.log(result.error.message); // error details
+}
+```
+
+Unlike `valid()`, which only tells you true/false, `safeParse` gives you the parsed data on success and the actual error on failure — all without needing `try/catch`.
+
 ## `NIC.parse()`
 
 Parsing also validates. If the NIC is invalid, `.parse()` throws before returning any data:

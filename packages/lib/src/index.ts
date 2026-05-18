@@ -8,6 +8,7 @@ export type {
   NICOptions,
   RawNICParts,
   NICLetter,
+  SafeParseResult,
 } from "./core";
 
 export { NewNICBuilder, OldNICBuilder } from "./builder";

@@ -51,6 +51,14 @@ NIC.validate("901404567V"); // throws if invalid
 // Check without throwing
 NIC.valid("901404567V"); // true
 NIC.valid("invalid"); // false
+
+// Safe parse — returns a result object, never throws
+const result = NIC.safeParse("901404567V");
+if (result.success) {
+  console.log(result.data.gender); // "MALE"
+} else {
+  console.log(result.error.message);
+}
 ```
 
 ## Build a NIC
