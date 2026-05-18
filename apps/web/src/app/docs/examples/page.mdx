@@ -147,15 +147,22 @@ function RegistrationForm() {
 
   const handleNICChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (NIC.valid(value)) {
+
+    try {
       const parsed = NIC.parse(value);
       setValue("gender", parsed.gender);
       setValue("birthYear", parsed.birthday.year);
       setValue("birthMonth", parsed.birthday.month);
       setValue("birthDay", parsed.birthday.day);
       setValue("age", parsed.age);
-    }
-  };
+    } catch (error) {
+      if (error instanceof NICError) {
+        // Show error.message to the user
+        console.log(error.message);
+      } 
+    };
+
+  }
 
   return (
     <form>

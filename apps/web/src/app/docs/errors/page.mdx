@@ -55,17 +55,3 @@ try {
 }
 ```
 
-## With `NIC.valid()`
-
-If you don't want to deal with try/catch, use `NIC.valid()`:
-
-```typescript
-if (NIC.valid(userInput)) {
-  const result = NIC.parse(userInput);
-  // safe to use
-} else {
-  // invalid NIC
-}
-```
-
-> **Note**: `NIC.valid()` catches `NICError` only. If your custom `check` function throws a `TypeError` or other non-NICError exception, it will still propagate.
