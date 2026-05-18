@@ -1,5 +1,11 @@
 # @sri-lanka/nic
 
+## 1.4.0
+
+### Minor Changes
+
+- 29a4296: Add `NIC.safeParse()` — a non-throwing alternative to `NIC.parse()`. Returns `{ success: true, data }` with the parsed NIC on success, or `{ success: false, error }` on failure. Also exports the `SafeParseResult` type.
+
 ## 1.3.1
 
 ### Patch Changes
