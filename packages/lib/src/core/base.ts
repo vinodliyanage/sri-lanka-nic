@@ -1,4 +1,4 @@
-import { Birthday, daylk, Gender, NICType } from "../common";
+import { Birthday, daylk, errors, Gender, NICError, NICType } from "../common";
 import { FormattedNICParts, RawNICParts, InternalNIC, ResolvedNICConfig } from "./types";
 
 export abstract class BaseNIC implements InternalNIC {
@@ -41,25 +41,23 @@ export abstract class BaseNIC implements InternalNIC {
   get birthday(): Birthday {
     const { year, days } = this.formatted;
 
-    let totals = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365];
-    if (daylk.isLeap(year)) totals = totals.map((count, index) => (index > 0 ? count + 1 : count));
+    const monthDays = daylk.MONTH_DAYS;
+    let remaining = days;
 
-    let prev = 0;
-    let month = 1;
-    let day = 0;
+    for (let i = 0; i < monthDays.length; i++) {
+      const count = monthDays[i];
 
-    for (let i = 0; i < totals.length; i++) {
-      const curr = totals[i];
-      if (days > curr) {
-        month++;
-        prev = curr;
-      } else {
-        day = days - prev;
-        break;
+      if (remaining <= count) {
+        const month = i + 1;
+        const day = remaining;
+
+        return { year, month, day };
       }
+
+      remaining -= count;
     }
 
-    return { year, month, day };
+    throw new NICError(errors.INVALID_NIC_BIRTHDAY);
   }
 
   get age() {

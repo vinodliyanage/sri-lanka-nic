@@ -1,4 +1,10 @@
 export const daylk = {
+  // The Sri Lankan government treats every year as having 366 days when encoding
+  // birthdays in NICs. February is always 29 days, regardless of whether the birth
+  // year is actually a leap year. This is the official NIC calendar convention.
+  MONTH_DAYS: [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+  TOTAL_DAYS_IN_YEAR: 366,
+
   get now() {
     const now = new Date();
 
@@ -19,22 +25,15 @@ export const daylk = {
     };
   },
 
-  isLeap(year: number) {
-    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-  },
+  dayOfYear(month: number, day: number) {
+    let total = 0;
+    for (let i = 0; i < month - 1; i++) total += this.MONTH_DAYS[i];
 
-  dayOfYear(year: number, month: number, day: number) {
-    const totals = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-    const leapOffset = month > 2 && this.isLeap(year) ? 1 : 0;
-    return totals[month - 1] + day + leapOffset;
+    return total + day;
   },
 
   currentDayOfYear() {
     const now = this.now;
-    return this.dayOfYear(now.year, now.month, now.day);
-  },
-
-  totalDaysInYear(year: number) {
-    return this.isLeap(year) ? 366 : 365;
+    return this.dayOfYear(now.month, now.day);
   },
 };

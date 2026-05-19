@@ -2,14 +2,7 @@ import { NICError, NICType } from "../common";
 import { NewNIC } from "./new";
 import { OldNIC } from "./old";
 import { NICValidator } from "./validator";
-import {
-  NICConfig,
-  InternalNIC,
-  PublicNIC as NICInstance,
-  NICAPI,
-  NICOptions,
-  SafeParseResult,
-} from "./types";
+import { NICConfig, InternalNIC, NICInstance, NICAPI, NICOptions, SafeParseResult } from "./types";
 import { NewNICBuilder, OldNICBuilder } from "../builder";
 
 export const NIC: NICAPI = {

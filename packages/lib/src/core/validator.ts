@@ -35,7 +35,6 @@ export const NICValidator = {
 
     const config = nic.config;
     const { year, days } = nic.formatted;
-    const totalDaysInBirthYear = daylk.totalDaysInYear(year);
 
     if (year < config.minimumBirthYear) {
       throw new NICError(errors.MAXIMUM_AGE_REQUIREMENT_NOT_MET);
@@ -45,7 +44,7 @@ export const NICValidator = {
       throw new NICError(errors.MINIMUM_AGE_REQUIREMENT_NOT_MET);
     }
 
-    if (days < 1 || days > totalDaysInBirthYear) {
+    if (days < 1 || days > daylk.TOTAL_DAYS_IN_YEAR) {
       throw new NICError(errors.INVALID_DAY_OF_YEAR);
     }
 
