@@ -62,7 +62,7 @@ export class OldNICBuilder extends BaseNICBuilder {
 
     const year = between(minimumBirthYear, maximumBirthYear);
 
-    let maxDays = daylk.totalDaysInYear(year);
+    let maxDays = daylk.TOTAL_DAYS_IN_YEAR;
     if (year === maximumBirthYear) maxDays = daylk.currentDayOfYear();
 
     const days = between(1, maxDays);

@@ -49,7 +49,7 @@ export abstract class BaseNICBuilder {
   birthday(birthday: Birthday) {
     const { year, month, day } = birthday;
 
-    const days = daylk.dayOfYear(year, month, day);
+    const days = daylk.dayOfYear(month, day);
 
     this.state.year = year;
     this.state.days = days;
@@ -64,20 +64,19 @@ export abstract class BaseNICBuilder {
    */
   age(age: number) {
     const now = daylk.now;
-    const todayDayOfYear = daylk.dayOfYear(now.year, now.month, now.day);
-    const totalDaysThisYear = daylk.totalDaysInYear(now.year);
+    const todayDayOfYear = daylk.dayOfYear(now.month, now.day);
 
-    const birthdayPassed = rand() < todayDayOfYear / totalDaysThisYear;
+    const birthdayPassed = rand() < todayDayOfYear / daylk.TOTAL_DAYS_IN_YEAR;
     const year = birthdayPassed ? now.year - age : now.year - age - 1;
 
     if (birthdayPassed) {
       // Born this many years ago, birthday on or before today
-      const maxDay = daylk.dayOfYear(year, now.month, now.day);
+      const maxDay = daylk.dayOfYear(now.month, now.day);
       this.state.days = between(1, maxDay);
     } else {
       // Born one more year ago, birthday is after today
-      const minDay = daylk.dayOfYear(year, now.month, now.day) + 1;
-      this.state.days = between(minDay, daylk.totalDaysInYear(year));
+      const minDay = daylk.dayOfYear(now.month, now.day) + 1;
+      this.state.days = between(minDay, daylk.TOTAL_DAYS_IN_YEAR);
     }
 
     this.state.year = year;
