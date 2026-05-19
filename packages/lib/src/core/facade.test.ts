@@ -84,7 +84,7 @@ describe("NIC.parse()", () => {
       expect(parsed.type).toBe(NICType.OLD);
       expect(parsed.value).toBe("901404567V");
       expect(parsed.gender).toBe(Gender.MALE);
-      expect(parsed.birthday).toEqual({ year: 1990, month: 5, day: 20 });
+      expect(parsed.birthday).toEqual({ year: 1990, month: 5, day: 19 });
       expect(parsed.parts.year).toBe("1990");
       expect(parsed.parts.days).toBe("140");
       expect(parsed.parts.serial).toBe("456");
@@ -192,7 +192,7 @@ describe("NIC.safeParse()", () => {
       expect(result.data.value).toBe("901404567V");
       expect(result.data.type).toBe(NICType.OLD);
       expect(result.data.gender).toBe(Gender.MALE);
-      expect(result.data.birthday).toEqual({ year: 1990, month: 5, day: 20 });
+      expect(result.data.birthday).toEqual({ year: 1990, month: 5, day: 19 });
     }
   });
 
@@ -389,7 +389,7 @@ describe("convert()", () => {
         .checkdigit("0")
         .build();
 
-      // The build process creates: yearStr=1990, days=140, nic=`1990140 0 234 0`
+      // The build process creates: yearStr=1990, days=141, nic=`1990141 0 234 0`
       // So serial in new format = "0234" which starts with "0" — this should work.
       // Let's explicitly test a case where it fails:
       // We need to parse a NIC where the serial part doesn't start with 0.

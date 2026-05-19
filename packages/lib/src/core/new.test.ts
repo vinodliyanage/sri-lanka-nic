@@ -79,24 +79,24 @@ describe("NewNIC", () => {
       expect(nic.birthday).toEqual({ year: 2000, month: 2, day: 29 });
     });
 
-    it("should compute Dec 31 in a non-leap year (day 365)", () => {
+    it("should compute Dec 30 for day 365 (Dec 31 is always day 366)", () => {
       const nic = new NewNIC("200136500000");
-      expect(nic.birthday).toEqual({ year: 2001, month: 12, day: 31 });
+      expect(nic.birthday).toEqual({ year: 2001, month: 12, day: 30 });
     });
 
-    it("should compute Dec 31 in a leap year (day 366)", () => {
+    it("should compute Dec 31 for day 366 (last day in NIC system)", () => {
       const nic = new NewNIC("200036600000");
       expect(nic.birthday).toEqual({ year: 2000, month: 12, day: 31 });
     });
 
-    it("should compute Mar 1 correctly in a leap year (day 61)", () => {
+    it("should compute Mar 1 correctly (always day 61, since Feb is always 29 days)", () => {
       const nic = new NewNIC("200006100010");
       expect(nic.birthday).toEqual({ year: 2000, month: 3, day: 1 });
     });
 
-    it("should compute Mar 1 correctly in a non-leap year (day 60)", () => {
+    it("should compute Feb 29 for day 60 (NIC system always treats Feb as 29 days)", () => {
       const nic = new NewNIC("200106000010");
-      expect(nic.birthday).toEqual({ year: 2001, month: 3, day: 1 });
+      expect(nic.birthday).toEqual({ year: 2001, month: 2, day: 29 });
     });
 
     it("should handle Female birthday (days encoded with +500)", () => {

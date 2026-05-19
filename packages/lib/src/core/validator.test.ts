@@ -65,25 +65,21 @@ describe("NICValidator", () => {
       expect(() => NICValidator.validate(nic)).toThrow(errors.INVALID_DAY_OF_YEAR);
     });
 
-    it("should throw INVALID_DAY_OF_YEAR for day > 366 in a leap year", () => {
-      // 2000 is a leap year, max day = 366. Day 367 is invalid.
+    it("should throw INVALID_DAY_OF_YEAR for day > 366", () => {
+      // Max day is always 366 regardless of year.
       const nic = new NewNIC("200036700000");
       expect(() => NICValidator.validate(nic)).toThrow(errors.INVALID_DAY_OF_YEAR);
     });
 
-    it("should throw INVALID_DAY_OF_YEAR for day > 365 in a non-leap year", () => {
-      // 2001 is not a leap year, so day 366 is invalid.
-      const nic = new NewNIC("200136600000");
-      expect(() => NICValidator.validate(nic)).toThrow(errors.INVALID_DAY_OF_YEAR);
+    it("should accept day 366 in any year (NIC system always uses 366 days)", () => {
+      // Day 366 is valid for both leap and non-leap years.
+      const nicLeap = new NewNIC("200036600000");
+      const nicNonLeap = new NewNIC("200136600000");
+      expect(() => NICValidator.validate(nicLeap)).not.toThrow();
+      expect(() => NICValidator.validate(nicNonLeap)).not.toThrow();
     });
 
-    it("should accept day 366 in a leap year", () => {
-      // 2000 is a leap year. Day 366 = Dec 31.
-      const nic = new NewNIC("200036600000");
-      expect(() => NICValidator.validate(nic)).not.toThrow();
-    });
-
-    it("should accept day 365 in a non-leap year", () => {
+    it("should accept day 365 in any year", () => {
       const nic = new NewNIC("200136500000");
       expect(() => NICValidator.validate(nic)).not.toThrow();
     });

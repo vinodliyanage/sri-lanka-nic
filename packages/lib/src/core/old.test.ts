@@ -4,8 +4,8 @@ import { NewNIC } from "./new";
 import { daylk, Gender, NICType, MINIMUM_LEGAL_AGE_TO_HAVE_NIC } from "../common";
 
 describe("OldNIC", () => {
-  const MALE_NIC = "901404567V"; // Male, born May 20 1990, voter
-  const FEMALE_NIC = "906404567V"; // Female: 140 + 500 = 640, born May 20 1990
+  const MALE_NIC = "901404567V"; // Male, born May 19 1990 (day 140), voter
+  const FEMALE_NIC = "906404567V"; // Female: 140 + 500 = 640, born May 19 1990
   const NON_VOTER_NIC = "901404567X";
 
   describe("constructor & value", () => {
@@ -55,8 +55,8 @@ describe("OldNIC", () => {
   describe(".birthday", () => {
     it("should compute birthday from old-format days", () => {
       const nic = new OldNIC(MALE_NIC);
-      // 1990 is not a leap year. Day 140 = May 20.
-      expect(nic.birthday).toEqual({ year: 1990, month: 5, day: 20 });
+      // NIC system always treats Feb=29, so day 140 = May 19 in every year.
+      expect(nic.birthday).toEqual({ year: 1990, month: 5, day: 19 });
     });
 
     it("should compute Jan 1 correctly (day 1)", () => {
@@ -77,11 +77,11 @@ describe("OldNIC", () => {
 
   describe(".age", () => {
     it("should calculate age relative to current Sri Lankan date", () => {
-      const nic = new OldNIC(MALE_NIC); // born May 20, 1990
+      const nic = new OldNIC(MALE_NIC); // born May 19, 1990
       const now = daylk.now;
 
       let expectedAge = now.year - 1990;
-      if (now.month < 5 || (now.month === 5 && now.day < 20)) {
+      if (now.month < 5 || (now.month === 5 && now.day < 19)) {
         expectedAge--;
       }
 

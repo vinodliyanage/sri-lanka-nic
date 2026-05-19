@@ -92,12 +92,12 @@ describe("NewNICBuilder", () => {
       const nic = NIC.builder
         .new()
         .gender(Gender.MALE)
-        .birthday({ year: 2001, month: 12, day: 31 }) // non-leap → day 365
+        .birthday({ year: 2001, month: 12, day: 31 }) // NIC system always uses 366 days → day 366
         .serial("0000")
         .checkdigit("0")
         .build();
 
-      expect(nic).toBe("200136500000");
+      expect(nic).toBe("200136600000");
 
       const parsed = NIC.parse(nic);
       expect(parsed.birthday).toEqual({ year: 2001, month: 12, day: 31 });

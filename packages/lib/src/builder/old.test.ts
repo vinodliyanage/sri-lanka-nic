@@ -44,8 +44,8 @@ describe("OldNICBuilder", () => {
         .letter("V")
         .build();
 
-      // year=1990 → "90", May 20 in non-leap = day 140, serial=456, check=7, letter=V
-      expect(nic).toBe("901404567V");
+      // year=1990 → "90", May 20 = day 141 (Feb always 29), serial=456, check=7, letter=V
+      expect(nic).toBe("901414567V");
 
       const parsed = NIC.parse(nic);
       expect(parsed.gender).toBe(Gender.MALE);
@@ -81,7 +81,8 @@ describe("OldNICBuilder", () => {
         .build();
 
       expect(nic).toMatch(/X$/);
-      expect(nic).toBe("850691005X");
+      // Mar 10 = day 70 (Jan=31 + Feb=29 + 10 = 70), serial=100 → "850701005X"
+      expect(nic).toBe("850701005X");
     });
   });
 
