@@ -75,6 +75,17 @@ const nic = NIC.builder
 console.log(nic); // "199516600000" (example)
 ```
 
+## Birthday Encoding
+
+The Sri Lankan government uses a **fixed 366-day calendar** when encoding birthdays in NIC numbers. February is always treated as having 29 days — regardless of whether the actual birth year is a leap year or not. This means:
+
+- Day 1 = January 1st
+- Day 60 = February 29th (in every year)
+- Day 61 = March 1st (in every year)
+- Day 366 = December 31st
+
+This library follows this official convention exactly when parsing and building NIC numbers.
+
 ## Convert Between Formats
 
 ```typescript

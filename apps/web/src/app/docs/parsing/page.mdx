@@ -17,9 +17,26 @@ const result = NIC.parse("901404567V");
 console.log(result.value); // "901404567V"
 console.log(result.type); // "OLD"
 console.log(result.gender); // "MALE"
-console.log(result.birthday); // { year: 1990, month: 5, day: 20 }
+console.log(result.birthday); // { year: 1990, month: 5, day: 19 }
 console.log(result.age); // calculated from current date
 ```
+
+## How Birthday Dates Are Encoded
+
+The Sri Lankan government uses a **fixed 366-day calendar** when encoding birthdays inside NIC numbers. This is an official convention — not a bug — and it affects every NIC ever issued.
+
+**February always has 29 days**, no matter what year you were born in. Even if your birth year was not a leap year, the NIC system still assigns day 60 to February 29th and day 61 to March 1st.
+
+| Day number | Date |
+|:---:|---|
+| 1 | January 1st |
+| 31 | January 31st |
+| **60** | **February 29th — in every year** |
+| **61** | **March 1st — in every year** |
+| 275 | October 1st |
+| 366 | December 31st |
+
+This library follows the official government convention exactly, so the birthdays it returns always match what was recorded by the Department of Registration of Persons.
 
 ## Auto-Sanitization
 
@@ -45,7 +62,7 @@ const result = NIC.safeParse("901404567V");
 
 if (result.success) {
   console.log(result.data.gender); // "MALE"
-  console.log(result.data.birthday); // { year: 1990, month: 5, day: 20 }
+  console.log(result.data.birthday); // { year: 1990, month: 5, day: 19 }
 } else {
   console.log(result.error.message); // error details
 }

@@ -65,7 +65,7 @@ When you parse or validate a NIC, the library executes checks in a very specific
 2. **Structural Validation**: Tests the string against strict Regular Expressions to ensure it is exactly 12 digits or 9 digits plus V/X.
 3. **Extraction**: Calculates the `year` and `days` from the raw string.
 4. **Type Restrictions**: If `onlyNew` or `onlyOld` is set, rejects NICs of the wrong format.
-5. **Logic Validations**: Verifies that the days correspond to a real day in that specific birth year, and that the computed age falls within the permitted minimum/maximum limits.
+5. **Logic Validations**: Verifies that the days field is a valid day number (1–366), and that the computed age falls within the permitted minimum/maximum limits.
 6. **Custom Validation (`check` callback)**: Finally, if you provided a `check` function in the config, it executes your custom rules. This guarantees your custom function only runs if the NIC is structurally and mathematically sound.
 
 ## What Gets Validated
@@ -73,10 +73,10 @@ When you parse or validate a NIC, the library executes checks in a very specific
 The library checks these things automatically:
 
 1. **Structure** — Must match either 12-digit or 9-digit+letter pattern
-2. **Day of year** — Must be between 1 and 365 (or 366 for leap years)
-3. **Minimum age** — Default: 15 (legal age to hold a NIC)
-4. **Maximum age** — Default: current year minus 1900
-5. **Birth year range** — Must fall within the valid range for the NIC format
+2. **Day of year** — Must be between 1 and 366. The NIC system always treats every year as having 366 days (February always has 29 days), so 366 is valid for any birth year, not just leap years. See [How Birthday Dates Are Encoded](/docs/parsing#how-birthday-dates-are-encoded) for the full explanation.
+3. **Birth year** — Must be within the allowed birth year range (default: 1900 to current year minus minimum age). Old format NICs are additionally restricted to years 1900–1999.
+4. **Minimum age** — Default: 15 (legal age to hold a NIC)
+5. **Maximum age** — Default: current year minus 1900
 6. **Type restrictions** — If `onlyNew` or `onlyOld` is set, the NIC must be the specified format
 
 ## What is NOT Validated
