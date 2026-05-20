@@ -32,25 +32,36 @@ pnpm add @sri-lanka/nic
 yarn add @sri-lanka/nic
 ```
 
-## Quick Start
+## Validate a NIC
 
 ```typescript
 import { NIC } from "@sri-lanka/nic";
 
-// Parse a NIC
-const result = NIC.parse("200001501234");
+// Check without throwing
+NIC.valid("901404567V"); // true
+NIC.valid("invalid"); // false
+```
+
+## Parse a NIC
+
+```typescript
+import { NIC } from "@sri-lanka/nic";
+
+const result = NIC.parse("200001501234"); // throws if invalid
 
 console.log(result.birthday); // { year: 2000, month: 1, day: 15 }
 console.log(result.gender); // "MALE"
 console.log(result.age); // 25
 console.log(result.type); // "NEW"
+console.log(result.value); // "200001501234"
+console.log(result.parts); // { year: "2000", days: "015", serial: "123", checkdigit: "4", letter: null }
+console.log(result.config); // { minimumAge: 16, maximumAge: 126, minimumBirthYear: 1900, maximumBirthYear: 2010 }
+```
 
-// Validate
-NIC.validate("901404567V"); // throws if invalid
+### Safe Parse
 
-// Check without throwing
-NIC.valid("901404567V"); // true
-NIC.valid("invalid"); // false
+```typescript
+import { NIC } from "@sri-lanka/nic";
 
 // Safe parse — returns a result object, never throws
 const result = NIC.safeParse("901404567V");
@@ -75,16 +86,15 @@ const nic = NIC.builder
 console.log(nic); // "199516600000" (example)
 ```
 
-## Birthday Encoding
+### Build from Age
 
-The Sri Lankan government uses a **fixed 366-day calendar** when encoding birthdays in NIC numbers. February is always treated as having 29 days — regardless of whether the actual birth year is a leap year or not. This means:
+```typescript
+import { NIC, Gender } from "@sri-lanka/nic";
 
-- Day 1 = January 1st
-- Day 60 = February 29th (in every year)
-- Day 61 = March 1st (in every year)
-- Day 366 = December 31st
+const nic = NIC.builder.new().age(25).gender(Gender.FEMALE).build();
 
-This library follows this official convention exactly when parsing and building NIC numbers.
+console.log(nic); // A valid new-format NIC for a 25-year-old female
+```
 
 ## Convert Between Formats
 
